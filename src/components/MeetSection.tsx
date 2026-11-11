@@ -1,7 +1,13 @@
 import { motion, useReducedMotion } from 'motion/react'
+import type { CareActionId, PlantMood } from '../hooks/usePlantMood'
 import { PlantStage } from './PlantStage'
 
-export function MeetSection() {
+type MeetSectionProps = {
+  mood: PlantMood
+  activeEffect: CareActionId | null
+}
+
+export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
   const reduceMotion = useReducedMotion()
 
   return (
@@ -47,7 +53,7 @@ export function MeetSection() {
           </a>
         </motion.div>
       </div>
-      <PlantStage />
+      <PlantStage mood={mood} activeEffect={activeEffect} />
     </section>
   )
 }

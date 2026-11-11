@@ -9,7 +9,7 @@ An interactive web experience tracking the growth of Zenna — an adopted zinnia
 
 - Vite + React + TypeScript
 - [Motion](https://motion.dev/) for care feedback and stage presence
-- Authored illustrations / sketches under `src/assets/illustrations/` (not cheap polygon plant art)
+- Illustrated plant art under `src/assets/illustrations/` (authored / generated placeholders — not cheap polygon plant figures)
 - Growth diary as versioned JSON (`src/data/growth.json`)
 
 ## Page spine
@@ -17,8 +17,8 @@ An interactive web experience tracking the growth of Zenna — an adopted zinnia
 One composition, three chapters on a single page (not a navbar of widgets):
 
 1. **Meet** — brand-first hero + plant stage
-2. **Tend** — care mini-game actions (scaffold; feedback next)
-3. **Grow** — weekly diary driven by JSON (creative viz next)
+2. **Tend** — care mini-game (Water, Prune, Sunlight, Sing) with animated feedback; mood in `localStorage`
+3. **Grow** — botanical stem timeline driven by JSON (not a BI chart)
 
 ## Develop
 
@@ -34,16 +34,26 @@ npm run build
 npm run preview
 ```
 
+## Try the care ritual
+
+1. Scroll to **Tend** (or use “Tend Zenna”).
+2. Tap **Water**, **Prune**, or **Sunlight** — watch droplets, snip/leaf fall, or a warm ray wash on the plant stage.
+3. **Sing** is visual by default. Check **Enable Sing sound** for a soft Web Audio chime (opt-in).
+4. Mood stats persist in this browser via `localStorage`.
+5. Scroll to **Grow** for the week-by-week stem story.
+
 ## Project layout
 
 ```text
 src/
   components/     Meet, Tend, Grow, PlantStage
+  hooks/          usePlantMood (localStorage)
+  lib/            singAudio (opt-in Web Audio)
   data/growth.json
-  assets/illustrations/   authored plant art goes here
+  assets/illustrations/   plant + week art
   types/growth.ts
 public/
-  photos/         optional week photos (week-01.jpg, …)
+  photos/         optional real week photos later
 ```
 
 ## Add a week of growth
@@ -56,22 +66,22 @@ Edit `src/data/growth.json`. Each entry:
   "date": "2026-11-03",
   "heightCm": 12,
   "note": "First true leaves after the move indoors.",
-  "photo": "/photos/week-01.jpg"
+  "photo": "illustrations/zenna-week-01.jpg"
 }
 ```
 
-Commit the data (and optional photo under `public/photos/`). Redeploy.
+Commit the data (and optional art under `src/assets/illustrations/` or `public/photos/`). Redeploy.
 
 ## Care actions (mini-game)
 
-| Action | Feedback idea |
+| Action | Feedback |
 | --- | --- |
 | Water | Droplets, soil darkens, happy sway |
-| Prune | Snip + leaf fall, cleaner silhouette |
+| Prune | Snip flash + leaf fall |
 | Sunlight | Warm wash / ray drift, stretch toward light |
-| Sing | Opt-in audio + rhythmic petal/leaf pulse |
+| Sing | Petal pulse + optional chime (muted by default) |
 
-Plant mood is local (browser); diary growth is the real record. Sing stays muted / opt-in.
+Plant mood is local (browser); diary growth is the real record.
 
 ## Deploy
 
