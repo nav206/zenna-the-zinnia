@@ -16,7 +16,7 @@ An interactive web experience tracking the growth of Zenna — an adopted zinnia
 
 One composition, three chapters on a single page (not a navbar of widgets):
 
-1. **Meet** — brand-first hero + plant stage
+1. **Meet** — brand-first hero; flip the plant portrait for a Pokémon-style field card (taxonomy, needs, strengths, weakness)
 2. **Grow** — botanical stem timeline driven by JSON (story & data first)
 3. **Tend** — care mini-game (Water, Prune, Sunlight, Sing); mood in `localStorage`
 
@@ -36,7 +36,7 @@ npm run preview
 
 ## Try the story
 
-1. Land on **Meet**, then scroll to **Grow** (or use “Watch her grow”).
+1. Land on **Meet** — click / tap / keyboard-activate the plant to flip into her trading card, then scroll to **Grow** (or use “Watch her grow”).
 2. Read the week-by-week stem story — data and diary first.
 3. Continue to **Tend** (or use “Tend Zenna”) — tap **Water**, **Prune**, or **Sunlight**.
 4. While you stay, moisture / joy / neatness ease down slowly; light follows your browser’s local day (brighter) or night (softer). Hidden tabs pause.
@@ -47,10 +47,11 @@ npm run preview
 
 ```text
 src/
-  components/     Meet, Tend, Grow, PlantStage
+  components/     Meet, MeetPlantCard, Tend, Grow, PlantStage
   hooks/          usePlantMood (localStorage)
   lib/            singAudio (opt-in Web Audio)
   data/growth.json
+  data/plantProfile.ts    Meet trading-card facts
   assets/illustrations/   plant + week art
   types/growth.ts
 public/

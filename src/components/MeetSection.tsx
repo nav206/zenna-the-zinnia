@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from 'motion/react'
 import type { CareActionId, PlantMood } from '../hooks/usePlantMood'
-import { PlantStage } from './PlantStage'
+import { MeetPlantCard } from './MeetPlantCard'
 
 type MeetSectionProps = {
   mood: PlantMood
@@ -37,7 +37,8 @@ export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
           transition={{ duration: 0.8, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
         >
           An adopted flower learning the light — first her growth story, then a
-          quiet care ritual, on one page.
+          quiet care ritual, on one page. Flip her portrait for a pocket field
+          guide.
         </motion.p>
         <motion.div
           className="cta-row"
@@ -53,7 +54,7 @@ export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
           </a>
         </motion.div>
       </div>
-      <PlantStage mood={mood} activeEffect={activeEffect} />
+      <MeetPlantCard mood={mood} activeEffect={activeEffect} />
     </section>
   )
 }
