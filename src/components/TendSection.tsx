@@ -56,10 +56,10 @@ export function TendSection({
       <div className="tend-layout">
         <div className="chapter__inner tend-copy">
           <p className="eyebrow">Tend</p>
-          <h2 id="tend-title">A little care goes a long way</h2>
+          <h2 id="tend-title">Now that you know her</h2>
           <p className="section-lede">
-            Offer water, a prune, a wash of sun, or a song. Zenna remembers your
-            care on this device — her diary growth lives in the weeks below.
+            You’ve seen the weeks. Offer water, a prune, a wash of sun, or a
+            song — Zenna remembers your care on this device.
           </p>
 
           <div className="tend-status" aria-live="polite">

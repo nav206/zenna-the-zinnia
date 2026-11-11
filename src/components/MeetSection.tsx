@@ -36,8 +36,8 @@ export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
         >
-          An adopted flower learning the light — her growth story and a quiet
-          care ritual, on one page.
+          An adopted flower learning the light — first her growth story, then a
+          quiet care ritual, on one page.
         </motion.p>
         <motion.div
           className="cta-row"
@@ -45,11 +45,11 @@ export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.28 }}
         >
-          <a className="cta cta--primary" href="#tend">
-            Tend Zenna
-          </a>
-          <a className="cta cta--ghost" href="#grow">
+          <a className="cta cta--primary" href="#grow">
             Watch her grow
+          </a>
+          <a className="cta cta--ghost" href="#tend">
+            Tend Zenna
           </a>
         </motion.div>
       </div>

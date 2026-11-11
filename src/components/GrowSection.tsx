@@ -28,9 +28,9 @@ export function GrowSection() {
         <p className="eyebrow">Grow</p>
         <h2 id="grow-title">Weeks of becoming</h2>
         <p className="section-lede">
-          Real diary entries for {diary.plant.name} ({diary.plant.species}),
-          adopted {diary.plant.adopted}. Sample weeks until measurements catch
-          up — edit <code>src/data/growth.json</code> to add more.
+          The record first — real diary entries for {diary.plant.name} (
+          {diary.plant.species}), adopted {diary.plant.adopted}. Sample weeks
+          until measurements catch up; then scroll on to tend her.
         </p>
       </div>
 
@@ -110,6 +110,13 @@ export function GrowSection() {
             </motion.article>
           )
         })}
+      </div>
+
+      <div className="grow-handoff">
+        <p>Now that you’ve seen her weeks —</p>
+        <a className="cta cta--primary" href="#tend">
+          Tend Zenna
+        </a>
       </div>
     </section>
   )

@@ -17,8 +17,8 @@ An interactive web experience tracking the growth of Zenna — an adopted zinnia
 One composition, three chapters on a single page (not a navbar of widgets):
 
 1. **Meet** — brand-first hero + plant stage
-2. **Tend** — care mini-game (Water, Prune, Sunlight, Sing) with animated feedback; mood in `localStorage`
-3. **Grow** — botanical stem timeline driven by JSON (not a BI chart)
+2. **Grow** — botanical stem timeline driven by JSON (story & data first)
+3. **Tend** — care mini-game (Water, Prune, Sunlight, Sing); mood in `localStorage`
 
 ## Develop
 
@@ -34,13 +34,13 @@ npm run build
 npm run preview
 ```
 
-## Try the care ritual
+## Try the story
 
-1. Scroll to **Tend** (or use “Tend Zenna”).
-2. Tap **Water**, **Prune**, or **Sunlight** — watch droplets, snip/leaf fall, or a warm ray wash on the plant stage.
-3. **Sing** is visual by default. Check **Enable Sing sound** for a soft Web Audio chime (opt-in).
-4. Mood stats persist in this browser via `localStorage`.
-5. Scroll to **Grow** for the week-by-week stem story.
+1. Land on **Meet**, then scroll to **Grow** (or use “Watch her grow”).
+2. Read the week-by-week stem story — data and diary first.
+3. Continue to **Tend** (or use “Tend Zenna”) — tap **Water**, **Prune**, or **Sunlight**.
+4. **Sing** is visual by default. Check **Enable Sing sound** for a soft Web Audio chime (opt-in).
+5. Mood stats persist in this browser via `localStorage`.
 
 ## Project layout
 

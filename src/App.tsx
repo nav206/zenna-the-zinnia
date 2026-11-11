@@ -10,6 +10,7 @@ export default function App() {
   return (
     <main className="story">
       <MeetSection mood={mood} activeEffect={activeEffect} />
+      <GrowSection />
       <TendSection
         mood={mood}
         activeEffect={activeEffect}
@@ -17,7 +18,6 @@ export default function App() {
         onEffectComplete={clearEffect}
         onSoundToggle={setSoundEnabled}
       />
-      <GrowSection />
       <footer className="site-footer">
         <p>Zenna, the Zinnia — growth story &amp; care mini-game</p>
       </footer>
