@@ -24,6 +24,7 @@ const ACTIONS: {
 
 type TendSectionProps = {
   mood: PlantMood
+  daytime: boolean
   activeEffect: CareActionId | null
   onTend: (action: CareActionId) => void
   onEffectComplete: () => void
@@ -32,6 +33,7 @@ type TendSectionProps = {
 
 export function TendSection({
   mood,
+  daytime,
   activeEffect,
   onTend,
   onEffectComplete,
@@ -59,7 +61,12 @@ export function TendSection({
           <h2 id="tend-title">Now that you know her</h2>
           <p className="section-lede">
             You’ve seen the weeks. Offer water, a prune, a wash of sun, or a
-            song — Zenna remembers your care on this device.
+            song — metrics ease while you stay, and light follows your local
+            day or night. Zenna remembers on this device.
+          </p>
+
+          <p className="tend-sky" aria-live="polite">
+            {daytime ? 'Local day — light drifts brighter' : 'Local night — light drifts softer'}
           </p>
 
           <div className="tend-status" aria-live="polite">
@@ -67,7 +74,10 @@ export function TendSection({
               Care moments <strong>{mood.totalCare}</strong>
             </span>
             <span className="tend-status__stat">
-              Hydration <strong>{Math.round(mood.hydration)}</strong>
+              Moisture <strong>{Math.round(mood.hydration)}</strong>
+            </span>
+            <span className="tend-status__stat">
+              Neatness <strong>{Math.round(mood.neatness)}</strong>
             </span>
             <span className="tend-status__stat">
               Light <strong>{Math.round(mood.light)}</strong>

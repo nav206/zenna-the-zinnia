@@ -15,6 +15,25 @@ export type PlantMood = {
 
 const STORAGE_KEY = 'zenna-plant-mood-v1'
 
+/** Soft floor so drift never feels punishing or hits zero. */
+const DRIFT_FLOOR = 8
+
+/**
+ * Live tick while the page is open (paused when the tab is hidden).
+ * Moisture / joy / neatness ease down; light follows local day/night.
+ */
+const TICK_MS = 6000
+
+/**
+ * Browser-local day window (weather-agnostic, no IP/geo).
+ * Day: 06:00–17:59 → light drifts brighter toward a soft ceiling.
+ * Night: 18:00–05:59 → light drifts dimmer toward the floor.
+ */
+const DAY_START_HOUR = 6
+const DAY_END_HOUR = 18
+const LIGHT_DAY_CEILING = 88
+const LIGHT_NIGHT_FLOOR = DRIFT_FLOOR
+
 const DEFAULT_MOOD: PlantMood = {
   hydration: 55,
   neatness: 60,
@@ -28,6 +47,23 @@ const DEFAULT_MOOD: PlantMood = {
 
 function clamp(n: number, min = 0, max = 100) {
   return Math.min(max, Math.max(min, n))
+}
+
+function driftDown(value: number, amount: number) {
+  return clamp(value - amount, DRIFT_FLOOR, 100)
+}
+
+export function isLocalDaytime(date = new Date()) {
+  const hour = date.getHours()
+  return hour >= DAY_START_HOUR && hour < DAY_END_HOUR
+}
+
+function lightStep(current: number, daytime: boolean) {
+  const step = 1 + Math.floor(Math.random() * 2) // 1–2
+  if (daytime) {
+    return clamp(current + step, DRIFT_FLOOR, LIGHT_DAY_CEILING)
+  }
+  return clamp(current - step, LIGHT_NIGHT_FLOOR, 100)
 }
 
 function readStored(): PlantMood {
@@ -62,9 +98,11 @@ export function usePlantMood() {
   const [mood, setMood] = useState<PlantMood>(DEFAULT_MOOD)
   const [hydrated, setHydrated] = useState(false)
   const [activeEffect, setActiveEffect] = useState<CareActionId | null>(null)
+  const [daytime, setDaytime] = useState(() => isLocalDaytime())
 
   useEffect(() => {
     setMood(readStored())
+    setDaytime(isLocalDaytime())
     setHydrated(true)
   }, [])
 
@@ -72,6 +110,40 @@ export function usePlantMood() {
     if (!hydrated) return
     localStorage.setItem(STORAGE_KEY, JSON.stringify(mood))
   }, [mood, hydrated])
+
+  // Live drift: only while the tab is visible so background tabs don't punish.
+  useEffect(() => {
+    if (!hydrated) return
+
+    const tick = () => {
+      if (document.visibilityState !== 'visible') return
+      const nowDay = isLocalDaytime()
+      setDaytime(nowDay)
+      setMood((prev) => {
+        const drop = () => 1 + Math.floor(Math.random() * 2) // 1–2
+        return {
+          ...prev,
+          hydration: driftDown(prev.hydration, drop()),
+          neatness: driftDown(prev.neatness, drop()),
+          joy: driftDown(prev.joy, drop()),
+          light: lightStep(prev.light, nowDay),
+        }
+      })
+    }
+
+    const id = window.setInterval(tick, TICK_MS)
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        setDaytime(isLocalDaytime())
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    return () => {
+      window.clearInterval(id)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [hydrated])
 
   const clearEffect = useCallback(() => setActiveEffect(null), [])
 
@@ -81,7 +153,12 @@ export function usePlantMood() {
 
   const tend = useCallback((action: CareActionId) => {
     setMood((prev) => {
-      const next = { ...prev, lastAction: action, lastAt: Date.now(), totalCare: prev.totalCare + 1 }
+      const next = {
+        ...prev,
+        lastAction: action,
+        lastAt: Date.now(),
+        totalCare: prev.totalCare + 1,
+      }
       switch (action) {
         case 'water':
           next.hydration = clamp(prev.hydration + 18)
@@ -116,5 +193,6 @@ export function usePlantMood() {
     tend,
     setSoundEnabled,
     label: moodLabel(mood),
+    daytime,
   }
 }

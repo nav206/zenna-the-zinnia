@@ -4,7 +4,7 @@ import { TendSection } from './components/TendSection'
 import { usePlantMood } from './hooks/usePlantMood'
 
 export default function App() {
-  const { mood, activeEffect, clearEffect, tend, setSoundEnabled } =
+  const { mood, activeEffect, clearEffect, tend, setSoundEnabled, daytime } =
     usePlantMood()
 
   return (
@@ -13,6 +13,7 @@ export default function App() {
       <GrowSection />
       <TendSection
         mood={mood}
+        daytime={daytime}
         activeEffect={activeEffect}
         onTend={tend}
         onEffectComplete={clearEffect}

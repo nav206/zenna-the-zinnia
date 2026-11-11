@@ -416,11 +416,18 @@ code {
   }
 }
 
+.tend-sky {
+  margin: 1.15rem 0 0;
+  font-size: 0.88rem;
+  color: var(--leaf);
+  letter-spacing: 0.02em;
+}
+
 .tend-status {
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem 1.1rem;
-  margin-top: 1.5rem;
+  margin-top: 0.85rem;
   font-size: 0.88rem;
   color: var(--ink-muted);
 }
