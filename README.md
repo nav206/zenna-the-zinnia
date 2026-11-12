@@ -1,6 +1,6 @@
 # Zenna, the Zinnia
 
-An interactive web experience tracking the growth of Zenna — an adopted zinnia — with a same-page care mini-game (water, prune, sunlight, sing) and a creative growth story.
+A pet project. An interactive web experience tracking the growth of Zenna — an adopted zinnia — with a same-page care mini-game (water, prune, sunlight, sing) and a creative growth story.
 
 **Live:** _(URL after first deploy)_  
 **Standalone site** — also featured from the portfolio when that ships.
