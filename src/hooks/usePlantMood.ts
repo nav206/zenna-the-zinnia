@@ -22,7 +22,7 @@ const DRIFT_FLOOR = 8
  * Live tick while the page is open (paused when the tab is hidden).
  * Moisture / joy / neatness ease down; light follows local day/night.
  */
-const TICK_MS = 6000
+const TICK_MS = 12000
 
 /**
  * Browser-local day window (weather-agnostic, no IP/geo).

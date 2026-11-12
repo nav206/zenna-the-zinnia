@@ -98,7 +98,6 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
               <span className="plant-stage__mood">
                 <span className="plant-stage__mood-label">{label}</span>
               </span>
-              <span className="meet-card__hint">Tap to flip</span>
             </span>
           </motion.span>
 
@@ -155,9 +154,6 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
                 <span className="dex-card__text">
                   {plantProfile.weaknesses.join(' · ')}
                 </span>
-              </span>
-              <span className="meet-card__hint meet-card__hint--back">
-                Tap to flip back
               </span>
             </span>
           </motion.span>

@@ -39,7 +39,7 @@ npm run preview
 1. Land on **Meet** — click / tap / keyboard-activate the plant to flip into her trading card, then scroll to **Grow** (or use “Watch her grow”).
 2. Read the week-by-week stem story — data and diary first.
 3. Continue to **Tend** (or use “Tend Zenna”) — tap **Water**, **Prune**, or **Sunlight**.
-4. While you stay, moisture / joy / neatness ease down slowly; light follows your browser’s local day (brighter) or night (softer). Hidden tabs pause.
+4. While you stay, moisture / joy / neatness ease down about every 12s; light follows your browser’s local day (brighter) or night (softer). Hidden tabs pause.
 5. **Sing** is visual by default. Check **Enable Sing sound** for a soft Web Audio chime (opt-in).
 6. Mood stats persist in this browser via `localStorage`.
 

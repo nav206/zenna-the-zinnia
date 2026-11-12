@@ -220,28 +220,6 @@ code {
   height: 100%;
 }
 
-.meet-card__hint {
-  position: absolute;
-  z-index: 4;
-  top: 0.85rem;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0.28rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid var(--stroke);
-  background: rgba(14, 26, 18, 0.65);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  pointer-events: none;
-}
-
-.meet-card__hint--back {
-  top: auto;
-  bottom: 0.75rem;
-}
-
 .dex-card {
   display: flex;
   flex-direction: column;
