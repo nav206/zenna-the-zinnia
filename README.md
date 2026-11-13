@@ -16,8 +16,8 @@ A pet project. An interactive web experience tracking the growth of Zenna — an
 
 One composition, three chapters on a single page (not a navbar of widgets):
 
-1. **Meet** — brand-first hero; flip the plant portrait for a Pokémon-style field card (taxonomy, needs, strengths, weakness)
-2. **Grow** — botanical stem timeline driven by JSON (story & data first)
+1. **Meet** — brand-first hero + Frida-style zinnia spray; flip icon on the portrait for a witty field card
+2. **Grow** — stem timeline with leaf-shaped checkpoints, real diary dates, and editable care totals
 3. **Tend** — care mini-game (Water, Prune, Sunlight, Sing); mood in `localStorage`
 
 ## Develop
@@ -58,21 +58,25 @@ public/
   photos/         optional real week photos later
 ```
 
-## Add a week of growth
+## Add / update growth + totals
 
-Edit `src/data/growth.json`. Each entry:
+Edit `src/data/growth.json`:
+
+- `plant.adopted` and each `weeks[]` entry (`date`, `heightCm`, `title`, `note`, optional photo)
+- `stats` block for totals you refresh over time: `sunbathingHours`, `waterDrunkMl`, `leavesGrown`, `leavesShed`, `buds`, `flowers`, `updated`
 
 ```json
 {
-  "week": 1,
-  "date": "2026-11-03",
-  "heightCm": 12,
-  "note": "First true leaves after the move indoors.",
-  "photo": "illustrations/zenna-week-01.jpg"
+  "week": 3,
+  "date": "2026-11-13",
+  "heightCm": 38,
+  "title": "Branching out",
+  "note": "Two fresh side branches and two tight buds waiting.",
+  "photo": "illustrations/zenna-week-now.jpg"
 }
 ```
 
-Commit the data (and optional art under `src/assets/illustrations/` or `public/photos/`). Redeploy.
+Commit and redeploy.
 
 ## Care actions (mini-game)
 
@@ -107,6 +111,10 @@ npx vercel login
 npx vercel          # preview
 npx vercel --prod   # production (once linked)
 ```
+
+## Later (v2)
+
+Not in this build: richer care actions (e.g. deadheading), heavier animation polish, global Zenna + personal plants + accounts (“compete against me”), signup-count roots that grow with visitors. Footer roots art is a visual teaser only.
 
 ## Portfolio
 

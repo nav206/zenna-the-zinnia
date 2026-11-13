@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
+import fridaSpray from '../assets/illustrations/frida-zinnia-spray.jpg'
 import type { CareActionId, PlantMood } from '../hooks/usePlantMood'
 import { MeetPlantCard } from './MeetPlantCard'
 
@@ -13,6 +14,9 @@ export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
   return (
     <section className="chapter chapter--meet" id="meet" aria-labelledby="meet-title">
       <div className="chapter__copy">
+        <div className="meet-bloom-rail" aria-hidden="true">
+          <img src={fridaSpray} alt="" className="meet-bloom-rail__art" />
+        </div>
         <motion.p
           className="brand"
           id="meet-title"
