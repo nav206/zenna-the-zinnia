@@ -2,7 +2,7 @@
 
 An interactive web experience tracking the growth of Zenna — an adopted zinnia — with a same-page care mini-game (water, prune, sunlight, sing) and a creative growth story.
 
-**Live:** _(durable Vercel URL after Navneet claims / connects the project)_  
+**Live:** [https://zenna-the-zinnia.vercel.app/](https://zenna-the-zinnia.vercel.app/)  
 **Standalone site** — also featured from the portfolio when that ships.
 
 ## Stack
