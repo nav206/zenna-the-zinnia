@@ -18,21 +18,24 @@ function WaterOverlay({ reduce }: { reduce: boolean | null }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: reduce ? 0.15 : 0.35 }}
+      transition={{ duration: reduce ? 0.15 : 0.4 }}
     >
       {!reduce &&
-        Array.from({ length: 14 }).map((_, i) => (
+        Array.from({ length: 22 }).map((_, i) => (
           <span
             key={i}
             className="effect__drop"
             style={{
-              left: `${8 + ((i * 7) % 84)}%`,
-              animationDelay: `${(i % 7) * 0.08}s`,
-              animationDuration: `${0.7 + (i % 4) * 0.12}s`,
+              left: `${6 + ((i * 9) % 88)}%`,
+              width: `${4 + (i % 3)}px`,
+              height: `${12 + (i % 4) * 3}px`,
+              animationDelay: `${(i % 9) * 0.06}s`,
+              animationDuration: `${0.85 + (i % 5) * 0.1}s`,
             }}
           />
         ))}
       <div className="effect__soil-darken" />
+      <div className="effect__mist effect__mist--cool" />
     </motion.div>
   )
 }
@@ -47,23 +50,24 @@ function PruneOverlay({ reduce }: { reduce: boolean | null }) {
     >
       <motion.span
         className="effect__snip"
-        initial={reduce ? false : { scale: 0.6, opacity: 0, rotate: -20 }}
-        animate={{ scale: 1, opacity: [0, 1, 0], rotate: 12 }}
-        transition={{ duration: reduce ? 0.2 : 0.55 }}
+        initial={reduce ? false : { scale: 0.55, opacity: 0, rotate: -28 }}
+        animate={{ scale: [0.7, 1.05, 1], opacity: [0, 1, 0], rotate: [ -28, 8, 18] }}
+        transition={{ duration: reduce ? 0.2 : 0.7 }}
       />
       {!reduce &&
-        Array.from({ length: 5 }).map((_, i) => (
+        Array.from({ length: 8 }).map((_, i) => (
           <motion.span
             key={i}
             className="effect__leaf"
-            initial={{ opacity: 1, x: 0, y: 0, rotate: 0 }}
+            initial={{ opacity: 1, x: 0, y: 0, rotate: 0, scale: 1 }}
             animate={{
               opacity: 0,
-              x: (i - 2) * 28,
-              y: 90 + i * 12,
-              rotate: (i - 2) * 35,
+              x: (i - 3.5) * 26,
+              y: 70 + i * 16,
+              rotate: (i - 3.5) * 42,
+              scale: 0.7,
             }}
-            transition={{ duration: 0.9, delay: 0.08 * i, ease: 'easeIn' }}
+            transition={{ duration: 1.05, delay: 0.05 * i, ease: 'easeIn' }}
           />
         ))}
     </motion.div>
@@ -77,10 +81,19 @@ function SunlightOverlay({ reduce }: { reduce: boolean | null }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: reduce ? 0.2 : 0.5 }}
+      transition={{ duration: reduce ? 0.2 : 0.55 }}
     >
       <div className="effect__wash" />
       {!reduce && <div className="effect__rays" />}
+      <motion.div
+        className="effect__sun-core"
+        animate={
+          reduce
+            ? undefined
+            : { scale: [0.85, 1.1, 1], opacity: [0.2, 0.55, 0.25] }
+        }
+        transition={{ duration: 1.2 }}
+      />
     </motion.div>
   )
 }
@@ -94,14 +107,19 @@ function SingOverlay({ reduce }: { reduce: boolean | null }) {
       exit={{ opacity: 0 }}
     >
       {!reduce &&
-        Array.from({ length: 6 }).map((_, i) => (
+        Array.from({ length: 8 }).map((_, i) => (
           <motion.span
             key={i}
             className="effect__note"
-            initial={{ opacity: 0, y: 20, scale: 0.6 }}
-            animate={{ opacity: [0, 1, 0], y: -70 - i * 8, scale: 1 }}
-            transition={{ duration: 1.1, delay: i * 0.1 }}
-            style={{ left: `${20 + i * 12}%` }}
+            initial={{ opacity: 0, y: 24, scale: 0.5 }}
+            animate={{
+              opacity: [0, 1, 0],
+              y: -80 - i * 10,
+              scale: 1,
+              x: Math.sin(i) * 18,
+            }}
+            transition={{ duration: 1.25, delay: i * 0.08 }}
+            style={{ left: `${16 + i * 9}%` }}
           />
         ))}
       <motion.div
@@ -109,10 +127,51 @@ function SingOverlay({ reduce }: { reduce: boolean | null }) {
         animate={
           reduce
             ? undefined
-            : { scale: [1, 1.08, 1], opacity: [0.35, 0.7, 0.35] }
+            : { scale: [1, 1.1, 1], opacity: [0.3, 0.75, 0.3] }
         }
-        transition={{ duration: 0.9, repeat: 2 }}
+        transition={{ duration: 0.95, repeat: 2 }}
       />
+    </motion.div>
+  )
+}
+
+function DeadheadOverlay({ reduce }: { reduce: boolean | null }) {
+  return (
+    <motion.div
+      className="effect effect--deadhead"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.span
+        className="effect__snip effect__snip--bloom"
+        initial={reduce ? false : { scale: 0.5, opacity: 0, rotate: -40 }}
+        animate={{ scale: 1, opacity: [0, 1, 0], rotate: 16 }}
+        transition={{ duration: reduce ? 0.2 : 0.65 }}
+      />
+      {!reduce &&
+        Array.from({ length: 10 }).map((_, i) => (
+          <motion.span
+            key={i}
+            className="effect__petal"
+            initial={{
+              opacity: 1,
+              x: 0,
+              y: 0,
+              rotate: i * 36,
+              scale: 1,
+            }}
+            animate={{
+              opacity: 0,
+              x: Math.cos((i / 10) * Math.PI * 2) * (70 + (i % 3) * 18),
+              y: 40 + Math.sin((i / 10) * Math.PI * 2) * 30 + i * 10,
+              rotate: i * 36 + 140,
+              scale: 0.55,
+            }}
+            transition={{ duration: 1.15, delay: 0.04 * i, ease: 'easeOut' }}
+          />
+        ))}
+      <div className="effect__mist effect__mist--warm" />
     </motion.div>
   )
 }
@@ -128,7 +187,11 @@ export function PlantStage({
 
   useEffect(() => {
     if (!activeEffect || !onEffectComplete) return
-    const ms = reduceMotion ? 280 : 1200
+    const ms = reduceMotion
+      ? 280
+      : activeEffect === 'deadhead' || activeEffect === 'water'
+        ? 1400
+        : 1250
     const id = window.setTimeout(onEffectComplete, ms)
     return () => window.clearTimeout(id)
   }, [activeEffect, onEffectComplete, reduceMotion])
@@ -136,12 +199,14 @@ export function PlantStage({
   const sway =
     !reduceMotion &&
     (activeEffect === 'water' || activeEffect === 'sing'
-      ? { rotate: [-1.5, 1.8, -1.2, 0] }
+      ? { rotate: [-1.8, 2.1, -1.4, 0] }
       : activeEffect === 'sunlight'
-        ? { rotate: [-0.5, 2.5, 1.2, 0], y: [0, -6, -2, 0] }
+        ? { rotate: [-0.5, 2.8, 1.2, 0], y: [0, -8, -2, 0] }
         : activeEffect === 'prune'
-          ? { scale: [1, 0.985, 1.01, 1] }
-          : { rotate: [-0.6, 0.6, -0.6], y: [0, -3, 0] })
+          ? { scale: [1, 0.982, 1.012, 1] }
+          : activeEffect === 'deadhead'
+            ? { rotate: [0, -2.2, 1.5, 0], scale: [1, 0.99, 1.02, 1] }
+            : { rotate: [-0.7, 0.7, -0.7], y: [0, -3, 0] })
 
   return (
     <div
@@ -172,7 +237,7 @@ export function PlantStage({
           animate={sway || undefined}
           transition={
             activeEffect
-              ? { duration: reduceMotion ? 0.2 : 1.1, ease: 'easeInOut' }
+              ? { duration: reduceMotion ? 0.2 : 1.2, ease: 'easeInOut' }
               : {
                   duration: 5.5,
                   repeat: Infinity,
@@ -202,6 +267,9 @@ export function PlantStage({
           )}
           {activeEffect === 'sing' && (
             <SingOverlay key="sing" reduce={reduceMotion} />
+          )}
+          {activeEffect === 'deadhead' && (
+            <DeadheadOverlay key="deadhead" reduce={reduceMotion} />
           )}
         </AnimatePresence>
 
