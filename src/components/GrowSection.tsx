@@ -1,23 +1,44 @@
 import { motion, useReducedMotion } from 'motion/react'
-import week01 from '../assets/illustrations/zenna-week-01.jpg'
-import week02 from '../assets/illustrations/zenna-week-02.jpg'
-import week03 from '../assets/illustrations/zenna-week-03.jpg'
+import leafCardBg from '../assets/illustrations/leaf-card-bg.jpg'
+import weekAdopt from '../assets/illustrations/zenna-week-adopt.jpg'
+import weekBloom from '../assets/illustrations/zenna-week-bloom.jpg'
+import weekNow from '../assets/illustrations/zenna-week-now.jpg'
 import growth from '../data/growth.json'
 import type { GrowthDiary } from '../types/growth'
 
 const diary = growth as GrowthDiary
 
 const WEEK_ART: Record<number, string> = {
-  1: week01,
-  2: week02,
-  3: week03,
+  1: weekAdopt,
+  2: weekBloom,
+  3: weekNow,
 }
 
 const maxHeight = Math.max(...diary.weeks.map((w) => w.heightCm), 1)
 
+const STAT_ROWS = diary.stats
+  ? [
+      {
+        label: 'Sunbathing',
+        value: `${diary.stats.sunbathingHours.toLocaleString()} h`,
+      },
+      {
+        label: 'Water drunk',
+        value: `${diary.stats.waterDrunkMl.toLocaleString()} ml`,
+      },
+      {
+        label: 'Leaves grown / shed',
+        value: `${diary.stats.leavesGrown} / ${diary.stats.leavesShed}`,
+      },
+      {
+        label: 'Buds & flowers',
+        value: `${diary.stats.buds} buds · ${diary.stats.flowers} blooms`,
+      },
+    ]
+  : []
+
 /**
- * Growth as a botanical stem story — not a BI line chart.
- * Each week is a node along a rising stem; height becomes presence.
+ * Growth as a botanical stem story — leaf cards hold the whole diary entry.
  */
 export function GrowSection() {
   const reduceMotion = useReducedMotion()
@@ -28,11 +49,27 @@ export function GrowSection() {
         <p className="eyebrow">Grow</p>
         <h2 id="grow-title">Weeks of becoming</h2>
         <p className="section-lede">
-          The record first — real diary entries for {diary.plant.name} (
-          {diary.plant.species}), adopted {diary.plant.adopted}. Sample weeks
-          until measurements catch up; then scroll on to tend her.
+          The record first — {diary.plant.name} ({diary.plant.species}), adopted{' '}
+          {diary.plant.adopted}. Real checkpoints; edit{' '}
+          <code>src/data/growth.json</code> when she changes again.
         </p>
       </div>
+
+      {diary.stats && (
+        <div className="plant-stats" aria-label="Plant care totals">
+          <p className="plant-stats__updated">
+            Totals as of {diary.stats.updated}
+          </p>
+          <ul className="plant-stats__grid" role="list">
+            {STAT_ROWS.map((row) => (
+              <li key={row.label} className="plant-stats__item">
+                <span className="plant-stats__label">{row.label}</span>
+                <strong className="plant-stats__value">{row.value}</strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="growth-story" role="list">
         <div className="growth-story__stem" aria-hidden="true">
@@ -79,22 +116,30 @@ export function GrowSection() {
                 <span className="growth-node__height">{week.heightCm} cm</span>
               </div>
 
-              <div className="growth-node__panel">
-                {art && (
-                  <figure className="growth-node__figure">
+              <div className="growth-leaf-card">
+                <img
+                  className="growth-leaf-card__bg"
+                  src={leafCardBg}
+                  alt=""
+                  width={768}
+                  height={1024}
+                  aria-hidden="true"
+                />
+                <div className="growth-leaf-card__inner">
+                  {art && (
                     <img
+                      className="growth-leaf-card__thumb"
                       src={art}
                       alt=""
-                      width={648}
-                      height={864}
+                      width={320}
+                      height={240}
                       loading="lazy"
                     />
-                    <figcaption>Week {week.week}</figcaption>
-                  </figure>
-                )}
-                <div className="growth-node__copy">
-                  <div className="growth-node__meta">
-                    <span className="growth-entry__week">Week {week.week}</span>
+                  )}
+                  <div className="growth-leaf-card__meta">
+                    <span className="growth-entry__week">
+                      {week.title ?? `Week ${week.week}`}
+                    </span>
                     <time dateTime={week.date}>{week.date}</time>
                   </div>
                   <p className="growth-entry__note">{week.note}</p>

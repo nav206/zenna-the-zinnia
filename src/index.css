@@ -90,14 +90,16 @@ code {
   max-width: 34rem;
 }
 
-.brand {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(3.5rem, 12vw, 6.5rem);
-  font-weight: 560;
-  line-height: 0.92;
-  letter-spacing: -0.03em;
-  color: var(--petal);
+.brand-mark {
+  margin: 0 0 0.35rem;
+  max-width: 28rem;
+}
+
+.brand-mark__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
 }
 
 .headline {
@@ -220,20 +222,36 @@ code {
   height: 100%;
 }
 
+.meet-card__flip-badge {
+  position: absolute;
+  z-index: 5;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: rgba(14, 26, 18, 0.72);
+  color: var(--petal);
+  pointer-events: none;
+}
+
 .dex-card {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.4rem;
   width: 100%;
   height: 100%;
-  padding: 1rem 1.05rem 1.15rem;
+  padding: 0.9rem 1rem 1rem;
   border-radius: 1.35rem;
   border: 1px solid rgba(240, 179, 168, 0.35);
   background:
     linear-gradient(165deg, rgba(36, 61, 44, 0.96), rgba(14, 26, 18, 0.98)),
     radial-gradient(circle at 80% 0%, rgba(240, 179, 168, 0.18), transparent 45%);
   box-shadow: inset 0 0 0 1px rgba(238, 243, 232, 0.04);
-  overflow: hidden;
+  overflow: auto;
 }
 
 .dex-card__top {
@@ -245,7 +263,7 @@ code {
 
 .dex-card__name {
   font-family: var(--font-display);
-  font-size: 1.55rem;
+  font-size: clamp(1.15rem, 3.5vw, 1.45rem);
   font-weight: 560;
   color: var(--petal);
   letter-spacing: -0.02em;
@@ -261,8 +279,8 @@ code {
 
 .dex-card__portrait {
   display: block;
-  width: 42%;
-  margin: 0.15rem auto 0.1rem;
+  width: 36%;
+  margin: 0.1rem auto;
   border-radius: 0.85rem;
   overflow: hidden;
   border: 1px solid var(--stroke);
@@ -319,6 +337,22 @@ code {
 .dex-card__text {
   font-size: 0.88rem;
   line-height: 1.4;
+  color: var(--ink);
+}
+
+.dex-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.dex-card__chips span {
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.75rem;
+  line-height: 1.25;
   color: var(--ink);
 }
 
@@ -685,7 +719,55 @@ code {
 
 .grow-intro {
   max-width: 36rem;
-  margin-bottom: clamp(2rem, 5vw, 3rem);
+  margin-bottom: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+.plant-stats {
+  margin: 0 0 clamp(2rem, 5vw, 3rem);
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--stroke);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.plant-stats__updated {
+  margin: 0 0 0.85rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.plant-stats__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+@media (min-width: 700px) {
+  .plant-stats__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+
+.plant-stats__item {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.plant-stats__label {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.plant-stats__value {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 520;
+  color: var(--petal);
 }
 
 .growth-story {
@@ -741,25 +823,14 @@ code {
     grid-column: 2;
   }
 
-  .growth-node__panel {
+  .growth-leaf-card {
     grid-column: 3;
   }
 
-  .growth-node--flip .growth-node__panel {
+  .growth-node--flip .growth-leaf-card {
     grid-column: 1;
     grid-row: 1;
-    justify-self: stretch;
-    justify-items: end;
-    text-align: right;
-    margin-left: auto;
-  }
-
-  .growth-node--flip .growth-node__meta {
-    justify-content: flex-end;
-  }
-
-  .growth-node--flip .growth-node__bar {
-    margin-left: auto;
+    justify-self: end;
   }
 }
 
@@ -788,56 +859,83 @@ code {
   color: var(--leaf);
 }
 
-.growth-node__panel {
-  display: grid;
-  gap: 1rem;
-  width: min(100%, 28rem);
+.growth-leaf-card {
+  position: relative;
+  width: min(100%, 22rem);
+  isolation: isolate;
 }
 
-@media (min-width: 600px) {
-  .growth-node__panel {
-    grid-template-columns: 7.5rem minmax(0, 1fr);
-    align-items: start;
-  }
-
-  .growth-node--flip .growth-node__panel {
-    grid-template-columns: minmax(0, 1fr) 7.5rem;
-  }
-
-  .growth-node--flip .growth-node__figure {
-    order: 2;
-  }
+.growth-node--flip .growth-leaf-card {
+  justify-self: end;
 }
 
-.growth-node__figure {
-  margin: 0;
-  width: 7.5rem;
-}
-
-.growth-node__figure img {
+.growth-leaf-card__bg {
   display: block;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  height: auto;
+  border-radius: 48% 52% 45% 55% / 42% 40% 60% 58%;
+  pointer-events: none;
+}
+
+.growth-leaf-card__inner {
+  position: absolute;
+  inset: 18% 16% 16%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  overflow: auto;
+  color: #1c2a1c;
+}
+
+.growth-leaf-card__thumb {
+  display: block;
+  width: 42%;
+  max-width: 6.5rem;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
-  border-radius: 1.15rem 1.15rem 1.5rem 1.5rem;
-  border: 1px solid var(--stroke);
+  object-position: center 35%;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(28, 42, 28, 0.12);
+  align-self: center;
 }
 
-.growth-node__figure figcaption {
-  margin-top: 0.4rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-}
-
-.growth-node__meta {
+.growth-leaf-card__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem 1rem;
+  gap: 0.35rem 0.75rem;
   align-items: baseline;
-  font-size: 0.9rem;
-  color: var(--ink-muted);
+  font-size: 0.82rem;
+  color: rgba(28, 42, 28, 0.7);
+}
+
+.growth-leaf-card .growth-entry__week {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: #5c3a32;
+}
+
+.growth-leaf-card .growth-entry__note {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: #1c2a1c;
+}
+
+.growth-leaf-card .growth-node__bar {
+  margin-top: auto;
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(28, 42, 28, 0.12);
+  overflow: hidden;
+}
+
+.growth-leaf-card .growth-node__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #6f8f5c, #d98478);
 }
 
 .growth-entry__week {
@@ -850,22 +948,6 @@ code {
   margin: 0.55rem 0 0;
   line-height: 1.55;
   color: var(--ink);
-}
-
-.growth-node__bar {
-  margin-top: 0.9rem;
-  width: min(100%, 14rem);
-  height: 3px;
-  border-radius: 999px;
-  background: rgba(238, 243, 232, 0.08);
-  overflow: hidden;
-}
-
-.growth-node__bar span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--leaf), var(--petal));
 }
 
 .grow-handoff {

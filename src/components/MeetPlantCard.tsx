@@ -10,6 +10,28 @@ type MeetPlantCardProps = {
   activeEffect: CareActionId | null
 }
 
+function FlipIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M7 7h7a4 4 0 0 1 0 8H9" />
+      <path d="M10 4 7 7l3 3" />
+      <path d="M17 17H10a4 4 0 0 1 0-8h5" />
+      <path d="M14 20 17 17l-3-3" />
+    </svg>
+  )
+}
+
 export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
   const reduceMotion = useReducedMotion()
   const [flipped, setFlipped] = useState(false)
@@ -29,11 +51,7 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
           className="meet-card__flipper"
           aria-pressed={flipped}
           aria-labelledby={titleId}
-          title={
-            flipped
-              ? 'Flip back to plant portrait'
-              : 'Flip for Zenna’s field guide card'
-          }
+          title={flipped ? 'Flip back to plant portrait' : 'Flip for field guide'}
           onClick={toggle}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -42,9 +60,7 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
             }
           }}
           animate={
-            reduceMotion
-              ? { opacity: 1 }
-              : { rotateY: flipped ? 180 : 0 }
+            reduceMotion ? { opacity: 1 } : { rotateY: flipped ? 180 : 0 }
           }
           transition={
             reduceMotion
@@ -55,8 +71,8 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
         >
           <span id={titleId} className="visually-hidden">
             {flipped
-              ? `${plantProfile.name} trading card`
-              : `${plantProfile.name} plant portrait — flip for facts`}
+              ? `${plantProfile.commonName} field guide card`
+              : `${plantProfile.commonName} portrait — flip for facts`}
           </span>
 
           <motion.span
@@ -72,10 +88,18 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
             style={
               reduceMotion
                 ? undefined
-                : { backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }
+                : {
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                  }
             }
           >
             <span className="plant-stage__frame meet-card__frame">
+              {!flipped && (
+                <span className="meet-card__flip-badge" aria-hidden="true">
+                  <FlipIcon />
+                </span>
+              )}
               <span className="plant-stage__halo" aria-hidden="true" />
               <motion.span
                 className="plant-stage__art-wrap"
@@ -84,7 +108,11 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
                     ? undefined
                     : { rotate: [-0.6, 0.6, -0.6], y: [0, -3, 0] }
                 }
-                transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
+                transition={{
+                  duration: 5.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
               >
                 <img
                   className="plant-stage__art"
@@ -123,36 +151,56 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
           >
             <span className="dex-card">
               <span className="dex-card__top">
-                <span className="dex-card__name">{plantProfile.name}</span>
+                <span className="dex-card__name">{plantProfile.commonName}</span>
                 <span className="dex-card__type">{plantProfile.type}</span>
-              </span>
-              <span className="dex-card__portrait">
-                <img src={heroArt} alt="" width={216} height={288} draggable={false} />
               </span>
               <span className="dex-card__species">
                 <em>{plantProfile.scientificName}</em>
-                <span>{plantProfile.commonName}</span>
+              </span>
+              <span className="dex-card__portrait">
+                <img
+                  src={heroArt}
+                  alt=""
+                  width={216}
+                  height={288}
+                  draggable={false}
+                />
               </span>
               <span className="dex-card__tax">
-                Order {plantProfile.order} · Family {plantProfile.family} · Genus{' '}
-                {plantProfile.genus}
+                {plantProfile.order} · {plantProfile.family} · {plantProfile.genus}
+                <br />
+                {plantProfile.origin}
               </span>
               <span className="dex-card__block">
-                <span className="dex-card__label">Needs care</span>
-                <span className="dex-card__text">
-                  {plantProfile.needs.join(' · ')}
+                <span className="dex-card__label">Needs</span>
+                <span className="dex-card__chips">
+                  {plantProfile.needs.map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
                 </span>
               </span>
               <span className="dex-card__block">
-                <span className="dex-card__label">Strength</span>
-                <span className="dex-card__text">
-                  {plantProfile.strengths.join(' · ')}
+                <span className="dex-card__label">Strengths</span>
+                <span className="dex-card__chips">
+                  {plantProfile.strengths.map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
                 </span>
               </span>
               <span className="dex-card__block">
-                <span className="dex-card__label">Weakness</span>
-                <span className="dex-card__text">
-                  {plantProfile.weaknesses.join(' · ')}
+                <span className="dex-card__label">Weaknesses</span>
+                <span className="dex-card__chips">
+                  {plantProfile.weaknesses.map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
+                </span>
+              </span>
+              <span className="dex-card__block">
+                <span className="dex-card__label">Field notes</span>
+                <span className="dex-card__chips">
+                  {plantProfile.funFacts.map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
                 </span>
               </span>
             </span>

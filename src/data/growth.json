@@ -1,31 +1,44 @@
 {
-  "version": 1,
+  "version": 2,
   "plant": {
     "name": "Zenna",
     "species": "Zinnia elegans",
-    "adopted": "2026-10-20"
+    "adopted": "2026-09-26"
+  },
+  "stats": {
+    "sunbathingHours": 186,
+    "waterDrunkMl": 2400,
+    "leavesGrown": 28,
+    "leavesShed": 6,
+    "buds": 2,
+    "flowers": 2,
+    "updated": "2026-11-13",
+    "notes": "Starter estimates — edit this block when you remeasure."
   },
   "weeks": [
     {
       "week": 1,
-      "date": "2026-10-27",
-      "heightCm": 8,
-      "note": "Settling in after adoption — cotyledons still soft, first stretch toward the window.",
-      "photo": "illustrations/zenna-week-01.jpg"
+      "date": "2026-09-26",
+      "heightCm": 25,
+      "title": "Adoption day",
+      "note": "Came home already a little character — one open flower, about 25 cm tall, roots still figuring out the new pot and window.",
+      "photo": "illustrations/zenna-week-adopt.jpg"
     },
     {
       "week": 2,
-      "date": "2026-11-03",
-      "heightCm": 12,
-      "note": "First true leaves after the move indoors. Soil dries a little faster in the warm room.",
-      "photo": "illustrations/zenna-week-02.jpg"
+      "date": "2026-10-26",
+      "heightCm": 35,
+      "title": "Encore bloom",
+      "note": "A full month in: new flower opens, roughly +10 cm of height. Same sunny sill, thirstier soil, louder petals.",
+      "photo": "illustrations/zenna-week-bloom.jpg"
     },
     {
       "week": 3,
-      "date": "2026-11-10",
-      "heightCm": 16,
-      "note": "Stems firming up; a hint of bud color at the tip on bright afternoons.",
-      "photo": "illustrations/zenna-week-03.jpg"
+      "date": "2026-11-13",
+      "heightCm": 38,
+      "title": "Branching out",
+      "note": "Two fresh side branches and two tight buds waiting in the wings. Holding pattern for the next reveal.",
+      "photo": "illustrations/zenna-week-now.jpg"
     }
   ]
 }
