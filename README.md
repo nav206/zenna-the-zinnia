@@ -2,7 +2,7 @@
 
 An interactive web experience tracking the growth of Zenna — an adopted zinnia — with a same-page care mini-game (water, prune, sunlight, sing) and a creative growth story.
 
-**Live:** _(URL after first deploy)_  
+**Live:** _(durable Vercel URL after Navneet claims / connects the project)_  
 **Standalone site** — also featured from the portfolio when that ships.
 
 ## Stack
@@ -85,9 +85,28 @@ Commit the data (and optional art under `src/assets/illustrations/` or `public/p
 
 Plant mood is local (browser); diary growth is the real record.
 
-## Deploy
+## Deploy (Vercel)
 
-Any static host (Vercel, Netlify, Cloudflare Pages). Build command: `npm run build`. Output: `dist/`.
+Recommended host for this Vite + React SPA.
+
+**Settings**
+- Framework: Vite
+- Build command: `npm run build`
+- Output directory: `dist`
+- SPA rewrites: `vercel.json` routes `/(.*)` → `/index.html`
+
+**Option A — GitHub import (best for ongoing deploys)**
+1. Open [vercel.com/new](https://vercel.com/new) and sign in with GitHub.
+2. Import `nav206/zenna-the-zinnia`.
+3. Deploy from `main` (after merging PR #1) or from `cursor/tend-grow-experience-a89e` for a branch preview.
+4. Paste the production URL into **Live** above.
+
+**Option B — CLI**
+```bash
+npx vercel login
+npx vercel          # preview
+npx vercel --prod   # production (once linked)
+```
 
 ## Portfolio
 
