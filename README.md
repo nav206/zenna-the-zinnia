@@ -2,23 +2,23 @@
 
 A pet project. An interactive web experience tracking the growth of Zenna — an adopted zinnia — with a same-page care mini-game (water, prune, sunlight, sing) and a creative growth story.
 
-**Live:** _(URL after first deploy)_  
+**Live:** [https://zenna-the-zinnia.vercel.app/](https://zenna-the-zinnia.vercel.app/)  
 **Standalone site** — also featured from the portfolio when that ships.
 
 ## Stack
 
 - Vite + React + TypeScript
 - [Motion](https://motion.dev/) for care feedback and stage presence
-- Authored illustrations / sketches under `src/assets/illustrations/` (not cheap polygon plant art)
+- Illustrated plant art under `src/assets/illustrations/` (authored / generated placeholders — not cheap polygon plant figures)
 - Growth diary as versioned JSON (`src/data/growth.json`)
 
 ## Page spine
 
 One composition, three chapters on a single page (not a navbar of widgets):
 
-1. **Meet** — brand-first hero + plant stage
-2. **Tend** — care mini-game actions (scaffold; feedback next)
-3. **Grow** — weekly diary driven by JSON (creative viz next)
+1. **Meet** — brand-first hero; flip the plant portrait for a Pokémon-style field card (taxonomy, needs, strengths, weakness)
+2. **Grow** — botanical stem timeline driven by JSON (story & data first)
+3. **Tend** — care mini-game (Water, Prune, Sunlight, Sing); mood in `localStorage`
 
 ## Develop
 
@@ -34,16 +34,28 @@ npm run build
 npm run preview
 ```
 
+## Try the story
+
+1. Land on **Meet** — click / tap / keyboard-activate the plant to flip into her trading card, then scroll to **Grow** (or use “Watch her grow”).
+2. Read the week-by-week stem story — data and diary first.
+3. Continue to **Tend** (or use “Tend Zenna”) — tap **Water**, **Prune**, or **Sunlight**.
+4. While you stay, moisture / joy / neatness ease down about every 12s; light follows your browser’s local day (brighter) or night (softer). Hidden tabs pause.
+5. **Sing** is visual by default. Check **Enable Sing sound** for a soft Web Audio chime (opt-in).
+6. Mood stats persist in this browser via `localStorage`.
+
 ## Project layout
 
 ```text
 src/
-  components/     Meet, Tend, Grow, PlantStage
+  components/     Meet, MeetPlantCard, Tend, Grow, PlantStage
+  hooks/          usePlantMood (localStorage)
+  lib/            singAudio (opt-in Web Audio)
   data/growth.json
-  assets/illustrations/   authored plant art goes here
+  data/plantProfile.ts    Meet trading-card facts
+  assets/illustrations/   plant + week art
   types/growth.ts
 public/
-  photos/         optional week photos (week-01.jpg, …)
+  photos/         optional real week photos later
 ```
 
 ## Add a week of growth
@@ -56,26 +68,45 @@ Edit `src/data/growth.json`. Each entry:
   "date": "2026-11-03",
   "heightCm": 12,
   "note": "First true leaves after the move indoors.",
-  "photo": "/photos/week-01.jpg"
+  "photo": "illustrations/zenna-week-01.jpg"
 }
 ```
 
-Commit the data (and optional photo under `public/photos/`). Redeploy.
+Commit the data (and optional art under `src/assets/illustrations/` or `public/photos/`). Redeploy.
 
 ## Care actions (mini-game)
 
-| Action | Feedback idea |
+| Action | Feedback |
 | --- | --- |
 | Water | Droplets, soil darkens, happy sway |
-| Prune | Snip + leaf fall, cleaner silhouette |
+| Prune | Snip flash + leaf fall |
 | Sunlight | Warm wash / ray drift, stretch toward light |
-| Sing | Opt-in audio + rhythmic petal/leaf pulse |
+| Sing | Petal pulse + optional chime (muted by default) |
 
-Plant mood is local (browser); diary growth is the real record. Sing stays muted / opt-in.
+Plant mood is local (browser); diary growth is the real record.
 
-## Deploy
+## Deploy (Vercel)
 
-Any static host (Vercel, Netlify, Cloudflare Pages). Build command: `npm run build`. Output: `dist/`.
+Recommended host for this Vite + React SPA.
+
+**Settings**
+- Framework: Vite
+- Build command: `npm run build`
+- Output directory: `dist`
+- SPA rewrites: `vercel.json` routes `/(.*)` → `/index.html`
+
+**Option A — GitHub import (best for ongoing deploys)**
+1. Open [vercel.com/new](https://vercel.com/new) and sign in with GitHub.
+2. Import `nav206/zenna-the-zinnia`.
+3. Deploy from `main` (after merging PR #1) or from `cursor/tend-grow-experience-a89e` for a branch preview.
+4. Paste the production URL into **Live** above.
+
+**Option B — CLI**
+```bash
+npx vercel login
+npx vercel          # preview
+npx vercel --prod   # production (once linked)
+```
 
 ## Portfolio
 

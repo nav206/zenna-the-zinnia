@@ -1,48 +1,135 @@
-const ACTIONS = [
-  { id: 'water', label: 'Water', hint: 'Droplets, soil darkens, happy sway' },
-  { id: 'prune', label: 'Prune', hint: 'Snip + leaf fall, cleaner silhouette' },
+import { motion, useReducedMotion } from 'motion/react'
+import type { CareActionId, PlantMood } from '../hooks/usePlantMood'
+import { playSingChime } from '../lib/singAudio'
+import { PlantStage } from './PlantStage'
+
+const ACTIONS: {
+  id: CareActionId
+  label: string
+  hint: string
+}[] = [
+  { id: 'water', label: 'Water', hint: 'Droplets fall; soil darkens; a happy sway.' },
+  { id: 'prune', label: 'Prune', hint: 'A soft snip — spent leaves drift away.' },
   {
     id: 'sunlight',
     label: 'Sunlight',
-    hint: 'Warm wash / ray drift, stretch toward light',
+    hint: 'Warm wash and a stretch toward the window.',
   },
   {
     id: 'sing',
     label: 'Sing',
-    hint: 'Opt-in audio + rhythmic petal pulse (muted by default)',
+    hint: 'A quiet chime — enable sound if you want to hear it.',
   },
-] as const
+]
 
-/**
- * Care mini-game shell — actions and feedback land in a later pass.
- * Keep mood in localStorage; diary growth stays in growth.json.
- */
-export function TendSection() {
+type TendSectionProps = {
+  mood: PlantMood
+  daytime: boolean
+  activeEffect: CareActionId | null
+  onTend: (action: CareActionId) => void
+  onEffectComplete: () => void
+  onSoundToggle: (enabled: boolean) => void
+}
+
+export function TendSection({
+  mood,
+  daytime,
+  activeEffect,
+  onTend,
+  onEffectComplete,
+  onSoundToggle,
+}: TendSectionProps) {
+  const reduceMotion = useReducedMotion()
+
+  async function handleAction(id: CareActionId) {
+    if (activeEffect) return
+    if (id === 'sing' && mood.soundEnabled) {
+      try {
+        await playSingChime()
+      } catch {
+        // Autoplay policies — visual feedback still runs.
+      }
+    }
+    onTend(id)
+  }
+
   return (
     <section className="chapter chapter--tend" id="tend" aria-labelledby="tend-title">
-      <div className="chapter__inner">
-        <p className="eyebrow">Tend</p>
-        <h2 id="tend-title">A little care goes a long way</h2>
-        <p className="section-lede">
-          Water, prune, offer sunlight, or sing — each action will animate the
-          plant stage. Scaffold only for now.
-        </p>
-        <ul className="care-actions" role="list">
-          {ACTIONS.map((action) => (
-            <li key={action.id}>
-              <button
-                type="button"
-                className="care-action"
-                disabled
-                title="Coming soon"
-                aria-disabled="true"
-              >
-                <span className="care-action__label">{action.label}</span>
-                <span className="care-action__hint">{action.hint}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+      <div className="tend-layout">
+        <div className="chapter__inner tend-copy">
+          <p className="eyebrow">Tend</p>
+          <h2 id="tend-title">Now that you know her</h2>
+          <p className="section-lede">
+            You’ve seen the weeks. Offer water, a prune, a wash of sun, or a
+            song — metrics ease while you stay, and light follows your local
+            day or night. Zenna remembers on this device.
+          </p>
+
+          <p className="tend-sky" aria-live="polite">
+            {daytime ? 'Local day — light drifts brighter' : 'Local night — light drifts softer'}
+          </p>
+
+          <div className="tend-status" aria-live="polite">
+            <span className="tend-status__stat">
+              Care moments <strong>{mood.totalCare}</strong>
+            </span>
+            <span className="tend-status__stat">
+              Moisture <strong>{Math.round(mood.hydration)}</strong>
+            </span>
+            <span className="tend-status__stat">
+              Neatness <strong>{Math.round(mood.neatness)}</strong>
+            </span>
+            <span className="tend-status__stat">
+              Light <strong>{Math.round(mood.light)}</strong>
+            </span>
+            <span className="tend-status__stat">
+              Joy <strong>{Math.round(mood.joy)}</strong>
+            </span>
+          </div>
+
+          <label className="sound-toggle">
+            <input
+              type="checkbox"
+              checked={mood.soundEnabled}
+              onChange={(e) => onSoundToggle(e.target.checked)}
+            />
+            <span>Enable Sing sound</span>
+            <em>Muted by default</em>
+          </label>
+
+          <ul className="care-actions" role="list">
+            {ACTIONS.map((action, index) => (
+              <li key={action.id}>
+                <motion.button
+                  type="button"
+                  className={`care-action care-action--live${
+                    activeEffect === action.id ? ' is-active' : ''
+                  }`}
+                  disabled={Boolean(activeEffect)}
+                  onClick={() => void handleAction(action.id)}
+                  initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{
+                    duration: 0.45,
+                    delay: reduceMotion ? 0 : index * 0.05,
+                  }}
+                  whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                >
+                  <span className="care-action__label">{action.label}</span>
+                  <span className="care-action__hint">{action.hint}</span>
+                </motion.button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <PlantStage
+          mood={mood}
+          activeEffect={activeEffect}
+          onEffectComplete={onEffectComplete}
+          compact
+        />
       </div>
     </section>
   )
