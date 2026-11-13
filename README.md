@@ -16,8 +16,8 @@ A pet project. An interactive web experience tracking the growth of Zenna — an
 
 One composition, three chapters on a single page (not a navbar of widgets):
 
-1. **Meet** — brand-first hero + Frida-style zinnia spray; flip icon on the portrait for a witty field card
-2. **Grow** — stem timeline with leaf-shaped checkpoints, real diary dates, and editable care totals
+1. **Meet** — “Zenna” wordmark with Frida-style blooms growing through the letters; flip icon on the portrait for a witty field card
+2. **Grow** — stem timeline; each checkpoint is a leaf card with the diary text inside; editable care totals
 3. **Tend** — care mini-game (Water, Prune, Sunlight, Sing); mood in `localStorage`
 
 ## Develop

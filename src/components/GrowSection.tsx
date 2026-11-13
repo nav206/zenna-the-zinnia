@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
-import leafFrame from '../assets/illustrations/growth-leaf-frame.jpg'
+import leafCardBg from '../assets/illustrations/leaf-card-bg.jpg'
 import weekAdopt from '../assets/illustrations/zenna-week-adopt.jpg'
 import weekBloom from '../assets/illustrations/zenna-week-bloom.jpg'
 import weekNow from '../assets/illustrations/zenna-week-now.jpg'
@@ -38,8 +38,7 @@ const STAT_ROWS = diary.stats
   : []
 
 /**
- * Growth as a botanical stem story — not a BI line chart.
- * Leaf-shaped checkpoint cards; stats live in growth.json for easy edits.
+ * Growth as a botanical stem story — leaf cards hold the whole diary entry.
  */
 export function GrowSection() {
   const reduceMotion = useReducedMotion()
@@ -117,32 +116,27 @@ export function GrowSection() {
                 <span className="growth-node__height">{week.heightCm} cm</span>
               </div>
 
-              <div className="growth-node__panel">
-                <figure className="growth-node__leaf">
-                  <img
-                    className="growth-node__leaf-frame"
-                    src={leafFrame}
-                    alt=""
-                    width={768}
-                    height={1024}
-                    aria-hidden="true"
-                  />
+              <div className="growth-leaf-card">
+                <img
+                  className="growth-leaf-card__bg"
+                  src={leafCardBg}
+                  alt=""
+                  width={768}
+                  height={1024}
+                  aria-hidden="true"
+                />
+                <div className="growth-leaf-card__inner">
                   {art && (
                     <img
-                      className="growth-node__leaf-photo"
+                      className="growth-leaf-card__thumb"
                       src={art}
                       alt=""
-                      width={648}
-                      height={864}
+                      width={320}
+                      height={240}
                       loading="lazy"
                     />
                   )}
-                  <figcaption>
-                    {week.title ?? `Week ${week.week}`}
-                  </figcaption>
-                </figure>
-                <div className="growth-node__copy">
-                  <div className="growth-node__meta">
+                  <div className="growth-leaf-card__meta">
                     <span className="growth-entry__week">
                       {week.title ?? `Week ${week.week}`}
                     </span>
