@@ -7,6 +7,8 @@ export type CareActionId =
 
 export type PlantScope = 'global' | 'personal'
 
+export type GrowthStage = 'seedling' | 'growing' | 'mature'
+
 export type ApiPlant = {
   id: string
   scope: PlantScope
@@ -15,6 +17,8 @@ export type ApiPlant = {
   light: number
   joy: number
   totalCare: number
+  growthStage: GrowthStage
+  unlockedActions: CareActionId[]
   updatedAt: string
 }
 
@@ -105,7 +109,7 @@ export function fetchPersonalPlant() {
 }
 
 export function postCare(scope: PlantScope, action: CareActionId) {
-  return request<{ plant: ApiPlant }>('/api/care', {
+  return request<{ plant: ApiPlant; global?: ApiPlant }>('/api/care', {
     method: 'POST',
     body: JSON.stringify({ scope, action }),
   })

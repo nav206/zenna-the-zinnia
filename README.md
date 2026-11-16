@@ -42,17 +42,36 @@ npm run preview
 
 `npm run build` also runs `scripts/migrate.mjs` when `DATABASE_URL` is set.
 
-## Environment (Vercel)
+## Environment (Vercel) — database + secrets
 
-Set in the Vercel project — do not commit real values:
+**You do not have a production database yet.** Local/dev uses in-memory PGlite when `DATABASE_URL` is unset. Accounts, Global/Personal moods, and signup roots only survive deploys once Postgres is attached.
+
+### 1. Create Postgres on Vercel
+
+1. Open the [Vercel project](https://vercel.com) → **Storage** → **Create Database** → **Postgres** (Neon-backed is fine).
+2. Link it to `zenna-the-zinnia` for Production + Preview.
+3. Vercel injects `DATABASE_URL` (and usually `DATABASE_URL_UNPOOLED` / `POSTGRES_URL`). Prefer those auto-created values — do not invent connection strings.
+
+### 2. Set the session secret
+
+1. Project → **Settings** → **Environment Variables**
+2. Add `SESSION_SECRET` = a long random string (≥16 chars), e.g. from your password manager or `openssl rand -hex 32`
+3. Apply to Production + Preview
+4. Redeploy (or wait for the next push) so migrations run via `npm run build` → `scripts/migrate.mjs`
 
 | Variable | Purpose |
 | --- | --- |
-| `DATABASE_URL` | Postgres connection (Vercel Postgres / Neon / etc.) |
+| `DATABASE_URL` | Postgres (required for real accounts / global persistence) |
 | `DATABASE_URL_UNPOOLED` | Optional direct URL for migrations behind a pooler |
 | `SESSION_SECRET` | Cookie signing (≥16 chars). Required for auth in production |
 
-Copy `.env.example` for local reference only.
+Copy `.env.example` for local reference only — never commit real secrets.
+
+### Care rules (v2)
+
+- **Global:** anyone can use every care action (no login).
+- **Personal:** login required; new plots start as a **seedling** (water / sunlight / sing only). **Prune** unlocks at 6 care moments (**growing**); **deadhead** at 12 (**mature**).
+- Personal care also mirrors into **Global** statistics (shared garden counts every personal action).
 
 ## Try the story
 

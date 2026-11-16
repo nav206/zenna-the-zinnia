@@ -9,23 +9,37 @@ const ACTIONS: {
   id: CareActionId
   label: string
   hint: string
+  lockedHint: string
 }[] = [
-  { id: 'water', label: 'Water', hint: 'Droplets fall; soil darkens; a happy sway.' },
-  { id: 'prune', label: 'Prune', hint: 'A soft snip — spent leaves drift away.' },
+  {
+    id: 'water',
+    label: 'Water',
+    hint: 'Droplets fall; soil darkens; a happy sway.',
+    lockedHint: '',
+  },
+  {
+    id: 'prune',
+    label: 'Prune',
+    hint: 'A soft snip — spent leaves drift away.',
+    lockedHint: 'Unlocks when your seedling reaches growing (6 care moments).',
+  },
   {
     id: 'sunlight',
     label: 'Sunlight',
     hint: 'Warm wash and a stretch toward the window.',
+    lockedHint: '',
   },
   {
     id: 'sing',
     label: 'Sing',
     hint: 'A quiet chime — enable sound if you want to hear it.',
+    lockedHint: '',
   },
   {
     id: 'deadhead',
     label: 'Deadhead',
     hint: 'Spent blooms loosen and petal-fall — room for the next flush.',
+    lockedHint: 'Unlocks at mature (12 care moments).',
   },
 ]
 
@@ -77,6 +91,7 @@ export function TendSection({
 
   async function handleAction(id: CareActionId) {
     if (activeEffect || busy || needsAuth) return
+    if (scope === 'personal' && !mood.unlockedActions.includes(id)) return
     if (id === 'sing' && mood.soundEnabled) {
       try {
         await playSingChime()
@@ -94,9 +109,10 @@ export function TendSection({
           <p className="eyebrow">Tend</p>
           <h2 id="tend-title">Now that you know her</h2>
           <p className="section-lede">
-            Care for the shared Global Zenna, or sign in and grow your own plot
-            to compete with the IRL plant. Metrics ease while you stay; light
-            follows your local day or night.
+            Visitors can freely tend Global Zenna. Your own plot needs an
+            account — and starts as a seedling. Water, sunlight, and song first;
+            prune and deadhead unlock as she grows. Personal care also feeds
+            the global garden.
           </p>
 
           <div className="tend-modes" role="tablist" aria-label="Which Zenna to tend">
@@ -134,9 +150,9 @@ export function TendSection({
 
           <p className="tend-sky" aria-live="polite">
             {scope === 'global'
-              ? 'Shared plot — every visitor’s care accumulates'
+              ? 'Shared plot — open to every visitor'
               : user
-                ? `Personal plot — ${user.displayName}`
+                ? `Personal plot — ${user.displayName} · ${mood.growthStage}`
                 : 'Personal plot — sign in to begin'}
             {' · '}
             {daytime ? 'Local day' : 'Local night'}
@@ -147,6 +163,11 @@ export function TendSection({
               <span className="tend-status__stat">
                 Care moments <strong>{mood.totalCare}</strong>
               </span>
+              {scope === 'personal' && (
+                <span className="tend-status__stat">
+                  Stage <strong>{mood.growthStage}</strong>
+                </span>
+              )}
               <span className="tend-status__stat">
                 Moisture <strong>{Math.round(mood.hydration)}</strong>
               </span>
@@ -179,29 +200,45 @@ export function TendSection({
           </label>
 
           <ul className="care-actions" role="list">
-            {ACTIONS.map((action, index) => (
-              <li key={action.id}>
-                <motion.button
-                  type="button"
-                  className={`care-action care-action--live${
-                    activeEffect === action.id ? ' is-active' : ''
-                  }`}
-                  disabled={Boolean(activeEffect) || busy || needsAuth}
-                  onClick={() => void handleAction(action.id)}
-                  initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.4 }}
-                  transition={{
-                    duration: 0.45,
-                    delay: reduceMotion ? 0 : index * 0.05,
-                  }}
-                  whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-                >
-                  <span className="care-action__label">{action.label}</span>
-                  <span className="care-action__hint">{action.hint}</span>
-                </motion.button>
-              </li>
-            ))}
+            {ACTIONS.map((action, index) => {
+              const locked =
+                scope === 'personal' &&
+                !needsAuth &&
+                !mood.unlockedActions.includes(action.id)
+              const disabled =
+                Boolean(activeEffect) || busy || needsAuth || locked
+
+              return (
+                <li key={action.id}>
+                  <motion.button
+                    type="button"
+                    className={`care-action care-action--live${
+                      activeEffect === action.id ? ' is-active' : ''
+                    }${locked ? ' is-locked' : ''}`}
+                    disabled={disabled}
+                    onClick={() => void handleAction(action.id)}
+                    initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{
+                      duration: 0.45,
+                      delay: reduceMotion ? 0 : index * 0.05,
+                    }}
+                    whileTap={
+                      reduceMotion || locked ? undefined : { scale: 0.98 }
+                    }
+                  >
+                    <span className="care-action__label">
+                      {action.label}
+                      {locked ? ' · locked' : ''}
+                    </span>
+                    <span className="care-action__hint">
+                      {locked ? action.lockedHint : action.hint}
+                    </span>
+                  </motion.button>
+                </li>
+              )
+            })}
           </ul>
         </div>
 

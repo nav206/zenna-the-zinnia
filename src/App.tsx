@@ -42,6 +42,8 @@ export default function App() {
       light: plant.mood.light,
       joy: plant.mood.joy,
       totalCare: plant.mood.totalCare,
+      growthStage: 'mature',
+      unlockedActions: plant.mood.unlockedActions,
       updatedAt: new Date().toISOString(),
     })
   }, [
@@ -53,6 +55,7 @@ export default function App() {
     plant.mood.light,
     plant.mood.joy,
     plant.mood.totalCare,
+    plant.mood.unlockedActions,
   ])
 
   const handleScopeChange = (next: PlantScope) => {

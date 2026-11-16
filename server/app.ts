@@ -14,9 +14,11 @@ import { isCareAction } from './lib/careMath'
 import { sql, usingRemoteDb } from './lib/db'
 import {
   applyPlantCare,
+  CareLockedError,
   careTotals,
   getGlobalPlant,
   getPersonalPlant,
+  mirrorPersonalCareToGlobal,
   signupCount,
 } from './lib/plants'
 import { clientKey, takeRateLimit } from './lib/rateLimit'
@@ -167,33 +169,54 @@ app.post('/care', async (c) => {
   }
 
   const user = await readSession(c)
-  if (body.data.scope === 'personal') {
-    if (!user) return c.json({ error: 'Sign in to tend your own Zenna.' }, 401)
-    const limit = await takeRateLimit(`care:personal:${user.id}`, 90)
-    if (!limit.ok) {
-      return c.json({ error: 'Easy — give your plant a moment to breathe.' }, 429)
+
+  try {
+    if (body.data.scope === 'personal') {
+      if (!user) {
+        return c.json({ error: 'Sign in to tend your own Zenna.' }, 401)
+      }
+      // Soft anti-bot only — gardeners can keep tending.
+      const limit = await takeRateLimit(`care:personal:${user.id}`, 240)
+      if (!limit.ok) {
+        return c.json(
+          { error: 'Easy — give your seedling a short rest.' },
+          429,
+        )
+      }
+      const plant = await applyPlantCare({
+        scope: 'personal',
+        plantId: user.id,
+        userId: user.id,
+        action: body.data.action,
+      })
+      // Personal care always counts toward Global Zenna stats too.
+      const global = await mirrorPersonalCareToGlobal({
+        userId: user.id,
+        action: body.data.action,
+      })
+      return c.json({ plant, global })
     }
+
+    // Global: visitors may care freely (no login, no hourly care cap).
     const plant = await applyPlantCare({
-      scope: 'personal',
-      plantId: user.id,
-      userId: user.id,
+      scope: 'global',
+      plantId: 'global',
+      userId: user?.id ?? null,
       action: body.data.action,
     })
     return c.json({ plant })
+  } catch (error) {
+    if (
+      error instanceof CareLockedError ||
+      (error instanceof Error && error.name === 'CareLockedError')
+    ) {
+      return c.json(
+        { error: error instanceof Error ? error.message : 'Action locked.' },
+        403,
+      )
+    }
+    throw error
   }
-
-  const key = user ? `care:global:user:${user.id}` : `care:global:ip:${clientKey(c)}`
-  const limit = await takeRateLimit(key, user ? 60 : 30)
-  if (!limit.ok) {
-    return c.json({ error: 'Global Zenna has had enough care for now.' }, 429)
-  }
-  const plant = await applyPlantCare({
-    scope: 'global',
-    plantId: 'global',
-    userId: user?.id ?? null,
-    action: body.data.action,
-  })
-  return c.json({ plant })
 })
 
 app.get('/stats/roots', async (c) => {

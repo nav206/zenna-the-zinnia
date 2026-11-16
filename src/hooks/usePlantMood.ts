@@ -5,10 +5,11 @@ import {
   postCare,
   type ApiPlant,
   type CareActionId,
+  type GrowthStage,
   type PlantScope,
 } from '../lib/api'
 
-export type { CareActionId, PlantScope }
+export type { CareActionId, GrowthStage, PlantScope }
 
 export type PlantMood = {
   hydration: number
@@ -19,18 +20,25 @@ export type PlantMood = {
   lastAt: number
   soundEnabled: boolean
   totalCare: number
+  growthStage: GrowthStage
+  unlockedActions: CareActionId[]
 }
 
 const SOUND_KEY = 'zenna-sound-enabled-v2'
-
-/** Soft floor so drift never feels punishing or hits zero. */
 const DRIFT_FLOOR = 8
-
 const TICK_MS = 12000
 const DAY_START_HOUR = 6
 const DAY_END_HOUR = 18
 const LIGHT_DAY_CEILING = 88
 const LIGHT_NIGHT_FLOOR = DRIFT_FLOOR
+
+const ALL_ACTIONS: CareActionId[] = [
+  'water',
+  'prune',
+  'sunlight',
+  'sing',
+  'deadhead',
+]
 
 const DEFAULT_MOOD: PlantMood = {
   hydration: 55,
@@ -41,6 +49,18 @@ const DEFAULT_MOOD: PlantMood = {
   lastAt: 0,
   soundEnabled: false,
   totalCare: 0,
+  growthStage: 'mature',
+  unlockedActions: ALL_ACTIONS,
+}
+
+const SEEDLING_MOOD: PlantMood = {
+  ...DEFAULT_MOOD,
+  hydration: 42,
+  neatness: 48,
+  light: 44,
+  joy: 40,
+  growthStage: 'seedling',
+  unlockedActions: ['water', 'sunlight', 'sing'],
 }
 
 function clamp(n: number, min = 0, max = 100) {
@@ -71,6 +91,10 @@ function fromApi(plant: ApiPlant, soundEnabled: boolean, prev?: PlantMood): Plan
     light: plant.light,
     joy: plant.joy,
     totalCare: plant.totalCare,
+    growthStage: plant.growthStage,
+    unlockedActions: plant.unlockedActions?.length
+      ? plant.unlockedActions
+      : ALL_ACTIONS,
     soundEnabled,
     lastAction: prev?.lastAction ?? null,
     lastAt: prev?.lastAt ?? 0,
@@ -78,6 +102,8 @@ function fromApi(plant: ApiPlant, soundEnabled: boolean, prev?: PlantMood): Plan
 }
 
 export function moodLabel(mood: PlantMood): string {
+  if (mood.growthStage === 'seedling') return 'Seedling'
+  if (mood.growthStage === 'growing') return 'Growing'
   const avg = (mood.hydration + mood.neatness + mood.light + mood.joy) / 4
   if (avg >= 80) return 'Radiant'
   if (avg >= 65) return 'Content'
@@ -89,7 +115,9 @@ export function usePlantMood(opts: {
   scope: PlantScope
   authed: boolean
 }) {
-  const [mood, setMood] = useState<PlantMood>(DEFAULT_MOOD)
+  const [mood, setMood] = useState<PlantMood>(
+    opts.scope === 'personal' ? SEEDLING_MOOD : DEFAULT_MOOD,
+  )
   const [hydrated, setHydrated] = useState(false)
   const [activeEffect, setActiveEffect] = useState<CareActionId | null>(null)
   const [daytime, setDaytime] = useState(() => isLocalDaytime())
@@ -107,7 +135,7 @@ export function usePlantMood(opts: {
 
     if (opts.scope === 'personal' && !opts.authed) {
       setMood((prev) => ({
-        ...DEFAULT_MOOD,
+        ...SEEDLING_MOOD,
         soundEnabled,
         lastAction: prev.lastAction,
         lastAt: prev.lastAt,
@@ -123,7 +151,10 @@ export function usePlantMood(opts: {
 
     if (res.error || !res.data) {
       setApiError(res.error || 'Could not load plant.')
-      setMood({ ...DEFAULT_MOOD, soundEnabled })
+      setMood({
+        ...(opts.scope === 'personal' ? SEEDLING_MOOD : DEFAULT_MOOD),
+        soundEnabled,
+      })
       setHydrated(true)
       return
     }
@@ -141,11 +172,10 @@ export function usePlantMood(opts: {
     try {
       localStorage.setItem(SOUND_KEY, mood.soundEnabled ? '1' : '0')
     } catch {
-      // ignore quota / private mode
+      // ignore
     }
   }, [mood.soundEnabled, hydrated])
 
-  // Live drift is presentation-only while watching; server mood reloads on care.
   useEffect(() => {
     if (!hydrated) return
     if (opts.scope === 'personal' && !opts.authed) return
@@ -192,6 +222,13 @@ export function usePlantMood(opts: {
         setApiError('Sign in to tend your own Zenna.')
         return
       }
+      if (
+        opts.scope === 'personal' &&
+        !mood.unlockedActions.includes(action)
+      ) {
+        setApiError('Your plant needs to grow before that care action.')
+        return
+      }
       setBusy(true)
       setApiError(null)
       const res = await postCare(opts.scope, action)
@@ -207,7 +244,13 @@ export function usePlantMood(opts: {
       }))
       setActiveEffect(action)
     },
-    [activeEffect, busy, opts.authed, opts.scope],
+    [
+      activeEffect,
+      busy,
+      mood.unlockedActions,
+      opts.authed,
+      opts.scope,
+    ],
   )
 
   const applyExternalPlant = useCallback((plant: ApiPlant) => {
