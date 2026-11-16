@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
+import {
+  fetchGlobalPlant,
+  fetchPersonalPlant,
+  postCare,
+  type ApiPlant,
+  type CareActionId,
+  type GrowthStage,
+  type PlantScope,
+} from '../lib/api'
 
-export type CareActionId = 'water' | 'prune' | 'sunlight' | 'sing'
+export type { CareActionId, GrowthStage, PlantScope }
 
 export type PlantMood = {
   hydration: number
@@ -11,28 +20,25 @@ export type PlantMood = {
   lastAt: number
   soundEnabled: boolean
   totalCare: number
+  growthStage: GrowthStage
+  unlockedActions: CareActionId[]
 }
 
-const STORAGE_KEY = 'zenna-plant-mood-v1'
-
-/** Soft floor so drift never feels punishing or hits zero. */
+const SOUND_KEY = 'zenna-sound-enabled-v2'
 const DRIFT_FLOOR = 8
-
-/**
- * Live tick while the page is open (paused when the tab is hidden).
- * Moisture / joy / neatness ease down; light follows local day/night.
- */
 const TICK_MS = 12000
-
-/**
- * Browser-local day window (weather-agnostic, no IP/geo).
- * Day: 06:00–17:59 → light drifts brighter toward a soft ceiling.
- * Night: 18:00–05:59 → light drifts dimmer toward the floor.
- */
 const DAY_START_HOUR = 6
 const DAY_END_HOUR = 18
 const LIGHT_DAY_CEILING = 88
 const LIGHT_NIGHT_FLOOR = DRIFT_FLOOR
+
+const ALL_ACTIONS: CareActionId[] = [
+  'water',
+  'prune',
+  'sunlight',
+  'sing',
+  'deadhead',
+]
 
 const DEFAULT_MOOD: PlantMood = {
   hydration: 55,
@@ -43,6 +49,18 @@ const DEFAULT_MOOD: PlantMood = {
   lastAt: 0,
   soundEnabled: false,
   totalCare: 0,
+  growthStage: 'mature',
+  unlockedActions: ALL_ACTIONS,
+}
+
+const SEEDLING_MOOD: PlantMood = {
+  ...DEFAULT_MOOD,
+  hydration: 42,
+  neatness: 48,
+  light: 44,
+  joy: 40,
+  growthStage: 'seedling',
+  unlockedActions: ['water', 'sunlight', 'sing'],
 }
 
 function clamp(n: number, min = 0, max = 100) {
@@ -59,34 +77,33 @@ export function isLocalDaytime(date = new Date()) {
 }
 
 function lightStep(current: number, daytime: boolean) {
-  const step = 1 + Math.floor(Math.random() * 2) // 1–2
+  const step = 1 + Math.floor(Math.random() * 2)
   if (daytime) {
     return clamp(current + step, DRIFT_FLOOR, LIGHT_DAY_CEILING)
   }
   return clamp(current - step, LIGHT_NIGHT_FLOOR, 100)
 }
 
-function readStored(): PlantMood {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return DEFAULT_MOOD
-    const parsed = JSON.parse(raw) as Partial<PlantMood>
-    return {
-      ...DEFAULT_MOOD,
-      ...parsed,
-      hydration: clamp(Number(parsed.hydration ?? DEFAULT_MOOD.hydration)),
-      neatness: clamp(Number(parsed.neatness ?? DEFAULT_MOOD.neatness)),
-      light: clamp(Number(parsed.light ?? DEFAULT_MOOD.light)),
-      joy: clamp(Number(parsed.joy ?? DEFAULT_MOOD.joy)),
-      soundEnabled: Boolean(parsed.soundEnabled),
-      totalCare: Math.max(0, Number(parsed.totalCare ?? 0)),
-    }
-  } catch {
-    return DEFAULT_MOOD
+function fromApi(plant: ApiPlant, soundEnabled: boolean, prev?: PlantMood): PlantMood {
+  return {
+    hydration: plant.hydration,
+    neatness: plant.neatness,
+    light: plant.light,
+    joy: plant.joy,
+    totalCare: plant.totalCare,
+    growthStage: plant.growthStage,
+    unlockedActions: plant.unlockedActions?.length
+      ? plant.unlockedActions
+      : ALL_ACTIONS,
+    soundEnabled,
+    lastAction: prev?.lastAction ?? null,
+    lastAt: prev?.lastAt ?? 0,
   }
 }
 
 export function moodLabel(mood: PlantMood): string {
+  if (mood.growthStage === 'seedling') return 'Seedling'
+  if (mood.growthStage === 'growing') return 'Growing'
   const avg = (mood.hydration + mood.neatness + mood.light + mood.joy) / 4
   if (avg >= 80) return 'Radiant'
   if (avg >= 65) return 'Content'
@@ -94,33 +111,81 @@ export function moodLabel(mood: PlantMood): string {
   return 'Thirsty'
 }
 
-export function usePlantMood() {
-  const [mood, setMood] = useState<PlantMood>(DEFAULT_MOOD)
+export function usePlantMood(opts: {
+  scope: PlantScope
+  authed: boolean
+}) {
+  const [mood, setMood] = useState<PlantMood>(
+    opts.scope === 'personal' ? SEEDLING_MOOD : DEFAULT_MOOD,
+  )
   const [hydrated, setHydrated] = useState(false)
   const [activeEffect, setActiveEffect] = useState<CareActionId | null>(null)
   const [daytime, setDaytime] = useState(() => isLocalDaytime())
+  const [apiError, setApiError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
 
-  useEffect(() => {
-    setMood(readStored())
-    setDaytime(isLocalDaytime())
+  const load = useCallback(async () => {
+    setApiError(null)
+    let soundEnabled = false
+    try {
+      soundEnabled = localStorage.getItem(SOUND_KEY) === '1'
+    } catch {
+      soundEnabled = false
+    }
+
+    if (opts.scope === 'personal' && !opts.authed) {
+      setMood((prev) => ({
+        ...SEEDLING_MOOD,
+        soundEnabled,
+        lastAction: prev.lastAction,
+        lastAt: prev.lastAt,
+      }))
+      setHydrated(true)
+      return
+    }
+
+    const res =
+      opts.scope === 'global'
+        ? await fetchGlobalPlant()
+        : await fetchPersonalPlant()
+
+    if (res.error || !res.data) {
+      setApiError(res.error || 'Could not load plant.')
+      setMood({
+        ...(opts.scope === 'personal' ? SEEDLING_MOOD : DEFAULT_MOOD),
+        soundEnabled,
+      })
+      setHydrated(true)
+      return
+    }
+
+    setMood((prev) => fromApi(res.data!.plant, soundEnabled, prev))
     setHydrated(true)
-  }, [])
+  }, [opts.authed, opts.scope])
+
+  useEffect(() => {
+    void load()
+  }, [load])
 
   useEffect(() => {
     if (!hydrated) return
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(mood))
-  }, [mood, hydrated])
+    try {
+      localStorage.setItem(SOUND_KEY, mood.soundEnabled ? '1' : '0')
+    } catch {
+      // ignore
+    }
+  }, [mood.soundEnabled, hydrated])
 
-  // Live drift: only while the tab is visible so background tabs don't punish.
   useEffect(() => {
     if (!hydrated) return
+    if (opts.scope === 'personal' && !opts.authed) return
 
     const tick = () => {
       if (document.visibilityState !== 'visible') return
       const nowDay = isLocalDaytime()
       setDaytime(nowDay)
       setMood((prev) => {
-        const drop = () => 1 + Math.floor(Math.random() * 2) // 1–2
+        const drop = () => 1 + Math.floor(Math.random() * 2)
         return {
           ...prev,
           hydration: driftDown(prev.hydration, drop()),
@@ -138,12 +203,11 @@ export function usePlantMood() {
       }
     }
     document.addEventListener('visibilitychange', onVisibility)
-
     return () => {
       window.clearInterval(id)
       document.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [hydrated])
+  }, [hydrated, opts.authed, opts.scope])
 
   const clearEffect = useCallback(() => setActiveEffect(null), [])
 
@@ -151,38 +215,46 @@ export function usePlantMood() {
     setMood((prev) => ({ ...prev, soundEnabled: enabled }))
   }, [])
 
-  const tend = useCallback((action: CareActionId) => {
-    setMood((prev) => {
-      const next = {
-        ...prev,
+  const tend = useCallback(
+    async (action: CareActionId) => {
+      if (busy || activeEffect) return
+      if (opts.scope === 'personal' && !opts.authed) {
+        setApiError('Sign in to tend your own Zenna.')
+        return
+      }
+      if (
+        opts.scope === 'personal' &&
+        !mood.unlockedActions.includes(action)
+      ) {
+        setApiError('Your plant needs to grow before that care action.')
+        return
+      }
+      setBusy(true)
+      setApiError(null)
+      const res = await postCare(opts.scope, action)
+      setBusy(false)
+      if (res.error || !res.data) {
+        setApiError(res.error || 'Care action failed.')
+        return
+      }
+      setMood((prev) => ({
+        ...fromApi(res.data!.plant, prev.soundEnabled, prev),
         lastAction: action,
         lastAt: Date.now(),
-        totalCare: prev.totalCare + 1,
-      }
-      switch (action) {
-        case 'water':
-          next.hydration = clamp(prev.hydration + 18)
-          next.joy = clamp(prev.joy + 4)
-          next.light = clamp(prev.light - 2)
-          break
-        case 'prune':
-          next.neatness = clamp(prev.neatness + 16)
-          next.joy = clamp(prev.joy + 3)
-          next.hydration = clamp(prev.hydration - 3)
-          break
-        case 'sunlight':
-          next.light = clamp(prev.light + 18)
-          next.hydration = clamp(prev.hydration - 4)
-          next.joy = clamp(prev.joy + 5)
-          break
-        case 'sing':
-          next.joy = clamp(prev.joy + 14)
-          next.neatness = clamp(prev.neatness + 2)
-          break
-      }
-      return next
-    })
-    setActiveEffect(action)
+      }))
+      setActiveEffect(action)
+    },
+    [
+      activeEffect,
+      busy,
+      mood.unlockedActions,
+      opts.authed,
+      opts.scope,
+    ],
+  )
+
+  const applyExternalPlant = useCallback((plant: ApiPlant) => {
+    setMood((prev) => fromApi(plant, prev.soundEnabled, prev))
   }, [])
 
   return {
@@ -194,5 +266,10 @@ export function usePlantMood() {
     setSoundEnabled,
     label: moodLabel(mood),
     daytime,
+    apiError,
+    setApiError,
+    busy,
+    reload: load,
+    applyExternalPlant,
   }
 }

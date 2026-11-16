@@ -58,8 +58,8 @@ export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
           <a className="cta cta--primary" href="#grow">
             Watch her grow
           </a>
-          <a className="cta cta--ghost" href="#tend">
-            Tend Zenna
+          <a className="cta cta--ghost" href="#compete">
+            Compete against me
           </a>
         </motion.div>
       </div>
