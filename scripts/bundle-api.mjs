@@ -1,21 +1,26 @@
 import { build } from 'esbuild'
-import { copyFile, mkdir, rm } from 'node:fs/promises'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const apiDir = join(root, 'api')
 const outfile = join(apiDir, 'index.js')
-const catchAll = join(apiDir, '[...path].js')
 
 /**
- * Bundle the Hono app into a single ESM file so Vercel Node
- * does not crash on extensionless relative TypeScript imports.
+ * Single bundled ESM serverless entry for Vite + Vercel.
+ * Avoids catch-all filenames and extensionless multi-file ESM crashes.
  */
 await mkdir(apiDir, { recursive: true })
 
-// Remove prior TS handlers / stale bundles so only bundled JS is deployed.
-for (const name of ['index.ts', '[...path].ts', 'index.js', '[...path].js']) {
+for (const name of [
+  'index.ts',
+  'index.js',
+  '[...path].ts',
+  '[...path].js',
+  '[[...route]].ts',
+  '.gitignore',
+]) {
   await rm(join(apiDir, name), { force: true })
 }
 
@@ -27,10 +32,9 @@ await build({
   platform: 'node',
   format: 'esm',
   target: 'node20',
-  packages: 'external',
+  // Bundle JS deps; leave native/heavy DB drivers external.
+  external: ['pg', 'pg-native', '@electric-sql/pglite'],
   logLevel: 'info',
 })
 
-await copyFile(outfile, catchAll)
-
-console.log('bundle-api: wrote api/index.js and api/[...path].js')
+console.log('bundle-api: wrote', outfile)
