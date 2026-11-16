@@ -1,5 +1,5 @@
-import { getRequestListener } from '@hono/node-server'
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { sendHono } from '../server/nodeBridge.js'
 import app from '../lib/zenna-api.js'
 
 export const config = {
@@ -7,11 +7,9 @@ export const config = {
   maxDuration: 10,
 }
 
-const listener = getRequestListener(app.fetch)
-
-export default function handler(
+export default async function handler(
   req: IncomingMessage,
   res: ServerResponse,
-): void {
-  listener(req, res)
+): Promise<void> {
+  await sendHono(app, req, res)
 }
