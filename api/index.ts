@@ -1,9 +1,17 @@
-import { handle } from 'hono/vercel'
+import { getRequestListener } from '@hono/node-server'
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import app from '../lib/zenna-api.js'
 
 export const config = {
   runtime: 'nodejs',
-  maxDuration: 30,
+  maxDuration: 10,
 }
 
-export default handle(app)
+const listener = getRequestListener(app.fetch)
+
+export default function handler(
+  req: IncomingMessage,
+  res: ServerResponse,
+): void {
+  listener(req, res)
+}

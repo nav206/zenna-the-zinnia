@@ -1,6 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import pg from 'pg'
+import type pg from 'pg'
 
 export type SqlRow = Record<string, unknown>
 
@@ -12,9 +12,15 @@ type LocalDb = {
 const databaseUrl = process.env.DATABASE_URL?.trim() ?? ''
 let pool: pg.Pool | undefined
 let local: Promise<LocalDb> | undefined
+let pgModule: Promise<typeof import('pg')> | undefined
 
 export function usingRemoteDb() {
   return databaseUrl !== ''
+}
+
+async function getPg() {
+  pgModule ??= import('pg')
+  return pgModule
 }
 
 export async function sql<T extends SqlRow = SqlRow>(
@@ -22,9 +28,12 @@ export async function sql<T extends SqlRow = SqlRow>(
   params: unknown[] = [],
 ): Promise<T[]> {
   if (databaseUrl !== '') {
-    pool ??= new pg.Pool({
+    const pg = await getPg()
+    pool ??= new pg.default.Pool({
       connectionString: databaseUrl,
-      max: 5,
+      max: 1,
+      connectionTimeoutMillis: 5_000,
+      idleTimeoutMillis: 5_000,
       ssl:
         process.env.PGSSLMODE === 'disable'
           ? undefined
@@ -42,9 +51,10 @@ export async function sql<T extends SqlRow = SqlRow>(
 }
 
 async function startLocal(): Promise<LocalDb> {
-  // Lazy-load so production serverless bundles never pull in PGlite/WASM.
-  const spec = '@electric-sql/' + 'pglite'
-  const { PGlite } = await import(/* @vite-ignore */ spec)
+  // Keep the specifier split so bundlers/nft do not eagerly pack WASM.
+  const scope = '@electric-sql'
+  const name = 'pglite'
+  const { PGlite } = await import(/* webpackIgnore: true */ `${scope}/${name}`)
   const db = new PGlite()
   const dir = join(process.cwd(), 'migrations')
   const files = (await readdir(dir).catch(() => []))
