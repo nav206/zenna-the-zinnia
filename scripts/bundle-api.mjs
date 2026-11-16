@@ -1,5 +1,5 @@
 import { build } from 'esbuild'
-import { copyFile, mkdir, rm, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, rm } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -32,11 +32,5 @@ await build({
 })
 
 await copyFile(outfile, catchAll)
-
-// Tiny stub so local tooling that expects a TS entry still sees the folder.
-await writeFile(
-  join(apiDir, '.gitignore'),
-  ['index.js', '[...path].js', ''].join('\n'),
-)
 
 console.log('bundle-api: wrote api/index.js and api/[...path].js')
