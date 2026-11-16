@@ -43,8 +43,7 @@ export async function sql<T extends SqlRow = SqlRow>(
 
 async function startLocal(): Promise<LocalDb> {
   // Lazy-load so production serverless bundles never pull in PGlite/WASM.
-  const spec = '@electric-sql/' + 'pglite'
-  const { PGlite } = await import(/* @vite-ignore */ spec)
+  const { PGlite } = await import('@electric-sql/pglite')
   const db = new PGlite()
   const dir = join(process.cwd(), 'migrations')
   const files = (await readdir(dir).catch(() => []))

@@ -55,7 +55,6 @@ try {
     await client.end()
   }
 } catch (error) {
-  // Don't fail the whole Vite deploy if DB is briefly unreachable.
   console.error('migrate: failed (continuing build):', error)
   process.exit(0)
 }
