@@ -8,8 +8,7 @@
     "build": "tsc -b && vite build && node scripts/migrate.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
-    "migrate": "node scripts/migrate.mjs",
-    "bundle:api": "node scripts/bundle-api.mjs"
+    "migrate": "node scripts/migrate.mjs"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.16",
@@ -30,7 +29,6 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
-    "esbuild": "^0.25.12",
     "oxlint": "^1.90.0",
     "tsx": "^4.23.15",
     "typescript": "~7.0.2",
