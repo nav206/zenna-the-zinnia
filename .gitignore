@@ -27,7 +27,5 @@ dist-ssr
 *.sw?
 .vercel
 
-# Generated Vercel API bundles (created by scripts/bundle-api.mjs)
-api/index.js
-api/[...path].js
+# Local-only API folder noise (bundled handlers are committed for Vercel)
 api/.gitignore
