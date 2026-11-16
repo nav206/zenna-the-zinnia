@@ -39,9 +39,9 @@ const careSchema = z.object({
   scope: z.enum(['global', 'personal']),
 })
 
-export const app = new Hono().basePath('/api')
+const routes = new Hono()
 
-app.use(
+routes.use(
   '*',
   cors({
     origin: (origin) => origin || '*',
@@ -49,7 +49,7 @@ app.use(
   }),
 )
 
-app.get('/health', (c) =>
+routes.get('/health', (c) =>
   c.json({
     ok: true,
     db: usingRemoteDb() ? 'postgres' : 'pglite',
@@ -57,14 +57,14 @@ app.get('/health', (c) =>
   }),
 )
 
-app.get('/me', async (c) => {
+routes.get('/me', async (c) => {
   const user = await readSession(c)
   if (!user) return c.json({ user: null })
   const plant = await getPersonalPlant(user.id)
   return c.json({ user, plant })
 })
 
-app.post('/auth/signup', async (c) => {
+routes.post('/auth/signup', async (c) => {
   if (!authConfigured()) {
     return c.json(
       { error: 'Auth is not configured. Set SESSION_SECRET (16+ chars).' },
@@ -107,7 +107,7 @@ app.post('/auth/signup', async (c) => {
   return c.json({ user, plant, signupCount: roots }, 201)
 })
 
-app.post('/auth/login', async (c) => {
+routes.post('/auth/login', async (c) => {
   if (!authConfigured()) {
     return c.json(
       { error: 'Auth is not configured. Set SESSION_SECRET (16+ chars).' },
@@ -145,24 +145,24 @@ app.post('/auth/login', async (c) => {
   return c.json({ user, plant })
 })
 
-app.post('/auth/logout', async (c) => {
+routes.post('/auth/logout', async (c) => {
   clearSessionCookie(c)
   return c.json({ ok: true })
 })
 
-app.get('/plants/global', async (c) => {
+routes.get('/plants/global', async (c) => {
   const plant = await getGlobalPlant()
   return c.json({ plant })
 })
 
-app.get('/plants/personal', async (c) => {
+routes.get('/plants/personal', async (c) => {
   const user = await readSession(c)
   if (!user) return c.json({ error: 'Sign in to tend your own Zenna.' }, 401)
   const plant = await getPersonalPlant(user.id)
   return c.json({ plant })
 })
 
-app.post('/care', async (c) => {
+routes.post('/care', async (c) => {
   const body = careSchema.safeParse(await c.req.json().catch(() => null))
   if (!body.success || !isCareAction(body.data.action)) {
     return c.json({ error: 'Unknown care action.' }, 400)
@@ -219,13 +219,13 @@ app.post('/care', async (c) => {
   }
 })
 
-app.get('/stats/roots', async (c) => {
+routes.get('/stats/roots', async (c) => {
   const count = await signupCount()
   const totals = await careTotals()
   return c.json({ signupCount: count, ...totals })
 })
 
-app.get('/stats/compete', async (c) => {
+routes.get('/stats/compete', async (c) => {
   const user = await readSession(c)
   const global = await getGlobalPlant()
   const totals = await careTotals()
@@ -240,9 +240,27 @@ app.get('/stats/compete', async (c) => {
   })
 })
 
-app.onError((err, c) => {
+routes.onError((err, c) => {
   console.error('[zenna-api]', err)
   return c.json({ error: 'Something wilted on the server.' }, 500)
 })
+
+routes.notFound((c) =>
+  c.json(
+    {
+      error: 'Not found',
+      path: new URL(c.req.url).pathname,
+    },
+    404,
+  ),
+)
+
+/**
+ * Mount under /api (browser paths) and / (when Vercel catch-all
+ * strips the /api prefix from req.url).
+ */
+export const app = new Hono()
+app.route('/api', routes)
+app.route('/', routes)
 
 export default app
