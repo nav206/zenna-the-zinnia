@@ -8,7 +8,7 @@ export const config = {
   maxDuration: 10,
 }
 
-export default function handler(): Response {
+export default function handler(_request: Request): Response {
   const db = Boolean(process.env.DATABASE_URL?.trim())
   const secret = process.env.SESSION_SECRET?.trim() ?? ''
   return Response.json({
