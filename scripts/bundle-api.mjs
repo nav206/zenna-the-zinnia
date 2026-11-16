@@ -1,15 +1,17 @@
 import { build } from 'esbuild'
-import { mkdir, rm, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, rm } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const apiDir = join(root, 'api')
 const outfile = join(apiDir, 'index.js')
+const catchAll = join(apiDir, '[...path].js')
 
 /**
- * Single bundled ESM serverless entry for Vite + Vercel.
- * Avoids catch-all filenames and extensionless multi-file ESM crashes.
+ * Single ESM serverless bundle for Vite + Vercel (package.json "type": "module").
+ * Stub PGlite to keep the function lean; Neon DATABASE_URL is used in production.
+ * Emit both index.js and [...path].js so /api and /api/* resolve without rewrites.
  */
 await mkdir(apiDir, { recursive: true })
 
@@ -32,9 +34,32 @@ await build({
   platform: 'node',
   format: 'esm',
   target: 'node20',
-  // Bundle JS deps; leave native/heavy DB drivers external.
-  external: ['pg', 'pg-native', '@electric-sql/pglite'],
+  external: ['pg', 'pg-native'],
   logLevel: 'info',
+  plugins: [
+    {
+      name: 'stub-pglite',
+      setup(b) {
+        b.onResolve({ filter: /^@electric-sql\/pglite$/ }, () => ({
+          path: 'pglite-stub',
+          namespace: 'stub',
+        }))
+        b.onLoad({ filter: /.*/, namespace: 'stub' }, () => ({
+          contents: `
+            export class PGlite {
+              constructor() {
+                throw new Error(
+                  'PGlite is not bundled for Vercel. Set DATABASE_URL (Neon).',
+                )
+              }
+            }
+          `,
+          loader: 'js',
+        }))
+      },
+    },
+  ],
 })
 
-console.log('bundle-api: wrote', outfile)
+await copyFile(outfile, catchAll)
+console.log('bundle-api: wrote', outfile, 'and', catchAll)

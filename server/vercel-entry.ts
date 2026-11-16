@@ -3,7 +3,7 @@ import app from './app.js'
 
 export const config = {
   runtime: 'nodejs',
-  maxDuration: 30,
+  maxDuration: 10,
 }
 
 export default handle(app)
