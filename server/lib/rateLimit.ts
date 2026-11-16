@@ -1,4 +1,4 @@
-import { sql } from './db'
+import { sql } from './db.js'
 
 const WINDOW_MS = 60 * 60 * 1000
 

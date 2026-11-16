@@ -8,8 +8,8 @@ import {
   type CareAction,
   type GrowthStage,
   type MoodStats,
-} from './careMath'
-import { sql } from './db'
+} from './careMath.js'
+import { sql } from './db.js'
 
 export type PlantView = MoodStats & {
   id: string

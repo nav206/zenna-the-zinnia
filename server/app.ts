@@ -9,9 +9,9 @@ import {
   readSession,
   setSessionCookie,
   verifyPassword,
-} from './lib/auth'
-import { isCareAction } from './lib/careMath'
-import { sql, usingRemoteDb } from './lib/db'
+} from './lib/auth.js'
+import { isCareAction } from './lib/careMath.js'
+import { sql, usingRemoteDb } from './lib/db.js'
 import {
   applyPlantCare,
   CareLockedError,
@@ -20,8 +20,8 @@ import {
   getPersonalPlant,
   mirrorPersonalCareToGlobal,
   signupCount,
-} from './lib/plants'
-import { clientKey, takeRateLimit } from './lib/rateLimit'
+} from './lib/plants.js'
+import { clientKey, takeRateLimit } from './lib/rateLimit.js'
 
 const signupSchema = z.object({
   email: z.string().email().max(200),
@@ -175,7 +175,6 @@ app.post('/care', async (c) => {
       if (!user) {
         return c.json({ error: 'Sign in to tend your own Zenna.' }, 401)
       }
-      // Soft anti-bot only — gardeners can keep tending.
       const limit = await takeRateLimit(`care:personal:${user.id}`, 240)
       if (!limit.ok) {
         return c.json(
@@ -189,7 +188,6 @@ app.post('/care', async (c) => {
         userId: user.id,
         action: body.data.action,
       })
-      // Personal care always counts toward Global Zenna stats too.
       const global = await mirrorPersonalCareToGlobal({
         userId: user.id,
         action: body.data.action,
@@ -197,7 +195,6 @@ app.post('/care', async (c) => {
       return c.json({ plant, global })
     }
 
-    // Global: visitors may care freely (no login, no hourly care cap).
     const plant = await applyPlantCare({
       scope: 'global',
       plantId: 'global',

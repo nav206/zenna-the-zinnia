@@ -26,3 +26,8 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Generated Vercel API bundles (created by scripts/bundle-api.mjs)
+api/index.js
+api/[...path].js
+api/.gitignore
