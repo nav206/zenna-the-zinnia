@@ -1,30 +1,8 @@
 var __defProp = Object.defineProperty;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __esm = (fn, res) => function __init() {
-  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-};
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
-
-// stub:pglite-stub
-var pglite_stub_exports = {};
-__export(pglite_stub_exports, {
-  PGlite: () => PGlite
-});
-var PGlite;
-var init_pglite_stub = __esm({
-  "stub:pglite-stub"() {
-    PGlite = class {
-      constructor() {
-        throw new Error(
-          "PGlite is not bundled for Vercel. Set DATABASE_URL (Neon)."
-        );
-      }
-    };
-  }
-});
 
 // node_modules/hono/dist/adapter/vercel/handler.js
 var handle = (app2) => (req) => {
@@ -24332,8 +24310,12 @@ async function sql(text, params = []) {
   return result.rows;
 }
 async function startLocal() {
-  const { PGlite: PGlite2 } = await Promise.resolve().then(() => (init_pglite_stub(), pglite_stub_exports));
-  const db = new PGlite2();
+  const spec = "@electric-sql/pglite";
+  const { PGlite } = await import(
+    /* @vite-ignore */
+    spec
+  );
+  const db = new PGlite();
   const dir = join(process.cwd(), "migrations");
   const files = (await readdir(dir).catch(() => [])).filter((f) => f.endsWith(".sql")).sort();
   for (const file2 of files) {
