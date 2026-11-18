@@ -1,11 +1,25 @@
 # Zenna, the Zinnia
 
-A pet project. An interactive web experience tracking the growth of Zenna — an adopted zinnia — with a same-page care mini-game, global + personal plants, and a creative growth story.
+A pet project. An interactive web experience serving dual purpose: tracking the growth of Zenna (my adopted zinnia plant) and on the same-page a mini-game to care for your own virtual plant. 
 
-**Live:** [https://zenna-the-zinnia.vercel.app/](https://zenna-the-zinnia.vercel.app/)  
-**Standalone site** — also featured from the portfolio when that ships.
+**The project is Live At:** [https://zenna-the-zinnia.vercel.app/](https://zenna-the-zinnia.vercel.app/)  
 
-## Stack
+Here's how it works:
+
+### Step 1: You meet Zenna. 
+### Step 2: You see what Zenna has been up to.
+
+### Step 3: You get to take care of your own Zinnia plant (v2; v3 coming not very soon.)
+
+There are two ways you can interact with virtual plant. 
+- **Globally:** anyone can use every care action on the webpage (no login required).
+- **Personally:** You create an account using email+PW combination; new plots start as a **seedling** (water / sunlight / sing only). **Prune** unlocks at 6 care moments (**growing**); **deadhead** at 12 (**mature**).
+- Any personal care you provide to your dear plant also contributes to **Global** statistics (as if a shared garden counts every visitor's action on the site).
+
+
+ P.S. There are at least 3 easter eggs I have hidden in the webpage; if you find them-- you enter a giveaway for an actual plant.
+
+## Stack Used:
 
 - Vite + React + TypeScript
 - Hono API on Vercel serverless (`/api/*`)
@@ -16,13 +30,15 @@ A pet project. An interactive web experience tracking the growth of Zenna — an
 
 ## Page spine
 
-One composition on a single page (not a navbar of widgets):
+I decided to keep it as simple as possible, and make a single page artifact. I think it works well, do you agree?
 
 1. **Meet** — Frida-style “Zenna” wordmark; flip icon on the portrait for a field card
 2. **Grow** — stem timeline; leaf cards hold the diary; editable care totals
 3. **Compete** — soft compare of IRL / Global / Your Zenna; “Compete against me” CTA
 4. **Tend** — Water, Prune, Sunlight, Sing, Deadhead; Global or personal plot
 5. **Footer roots** — grow with account signup count
+
+Finally, Here's how I and Cursor made this project happen: 
 
 ## Develop
 
@@ -67,20 +83,6 @@ npm run preview
 
 Copy `.env.example` for local reference only — never commit real secrets.
 
-### Care rules (v2)
-
-- **Global:** anyone can use every care action (no login).
-- **Personal:** login required; new plots start as a **seedling** (water / sunlight / sing only). **Prune** unlocks at 6 care moments (**growing**); **deadhead** at 12 (**mature**).
-- Personal care also mirrors into **Global** statistics (shared garden counts every personal action).
-
-## Try the story
-
-1. **Meet** — flip the plant for the field card; continue to Grow or Compete.
-2. **Grow** — week-by-week diary (IRL truth lives in `growth.json`).
-3. **Compete** — see IRL vs Global vs your plot; CTA scrolls to Tend.
-4. **Tend** — **Care for Global** (no account) or **Care for Mine** (sign up / sign in).
-5. Try **Deadhead** plus the polished Water / Prune / Sunlight / Sing feedback.
-6. Watch footer roots deepen as accounts appear.
 
 ## Project layout
 
@@ -116,6 +118,7 @@ Global and personal moods persist in Postgres (or PGlite locally). Sing mute pre
 - SPA rewrite skips `/api/*` (see `vercel.json`)
 - Attach a Postgres store and set `DATABASE_URL` + `SESSION_SECRET`
 
+# NOTE TO SELF: 
 ## Portfolio
 
 Link or iframe this URL from the portfolio project card. Do not merge this app into the portfolio repo until both are stable.
