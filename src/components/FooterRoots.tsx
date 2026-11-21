@@ -46,7 +46,7 @@ export function FooterRoots({ refreshKey = 0 }: FooterRootsProps) {
   )
 
   return (
-    <footer className="site-footer site-footer--roots">
+    <footer className="site-footer site-footer--roots" id="roots">
       <div className="footer-roots" aria-hidden="true">
         <svg
           className="footer-roots__svg"

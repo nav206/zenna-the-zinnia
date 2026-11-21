@@ -4,6 +4,7 @@ import heroArt from '../assets/illustrations/zenna-plant-hero.jpg'
 import { plantProfile } from '../data/plantProfile'
 import type { CareActionId, PlantMood } from '../hooks/usePlantMood'
 import { moodLabel } from '../hooks/usePlantMood'
+import { trackPlantCardFlip } from '../lib/analytics'
 
 type MeetPlantCardProps = {
   mood: PlantMood
@@ -39,7 +40,11 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
   const label = moodLabel(mood)
 
   function toggle() {
-    setFlipped((v) => !v)
+    setFlipped((v) => {
+      const next = !v
+      trackPlantCardFlip(next)
+      return next
+    })
   }
 
   return (
