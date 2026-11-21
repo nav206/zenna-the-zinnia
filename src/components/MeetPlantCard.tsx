@@ -40,11 +40,9 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
   const label = moodLabel(mood)
 
   function toggle() {
-    setFlipped((v) => {
-      const next = !v
-      trackPlantCardFlip(next)
-      return next
-    })
+    const next = !flipped
+    setFlipped(next)
+    trackPlantCardFlip(next)
   }
 
   return (
