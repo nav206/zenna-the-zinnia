@@ -4,6 +4,7 @@ import weekAdopt from '../assets/illustrations/zenna-week-adopt.jpg'
 import weekBloom from '../assets/illustrations/zenna-week-bloom.jpg'
 import weekNow from '../assets/illustrations/zenna-week-now.jpg'
 import growth from '../data/growth.json'
+import { trackCtaClick } from '../lib/analytics'
 import type { GrowthDiary } from '../types/growth'
 
 const diary = growth as GrowthDiary
@@ -159,7 +160,11 @@ export function GrowSection() {
 
       <div className="grow-handoff">
         <p>Now that you’ve seen her weeks —</p>
-        <a className="cta cta--primary" href="#tend">
+        <a
+          className="cta cta--primary"
+          href="#tend"
+          onClick={() => trackCtaClick('tend_zenna', '#tend')}
+        >
           Tend Zenna
         </a>
       </div>

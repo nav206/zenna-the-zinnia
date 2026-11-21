@@ -6,6 +6,14 @@ import { MeetSection } from './components/MeetSection'
 import { TendSection } from './components/TendSection'
 import { useAuth } from './hooks/useAuth'
 import { usePlantMood, type PlantScope } from './hooks/usePlantMood'
+import {
+  observeSectionViews,
+  trackAuth,
+  trackCareAction,
+  trackCtaClick,
+  trackScopeChange,
+  trackSoundToggle,
+} from './lib/analytics'
 import { fetchCompeteStats, type ApiPlant } from './lib/api'
 
 export default function App() {
@@ -31,6 +39,10 @@ export default function App() {
   useEffect(() => {
     void refreshCompete()
   }, [refreshCompete, auth.user?.id])
+
+  useEffect(() => {
+    return observeSectionViews(['meet', 'grow', 'compete', 'tend', 'roots'])
+  }, [])
 
   useEffect(() => {
     if (scope !== 'global' || !plant.hydrated || plant.apiError) return
@@ -61,6 +73,7 @@ export default function App() {
   const handleScopeChange = (next: PlantScope) => {
     setScope(next)
     plant.setApiError(null)
+    trackScopeChange(next)
   }
 
   const handleSignup = async (input: {
@@ -70,6 +83,7 @@ export default function App() {
   }) => {
     const ok = await auth.signup(input)
     if (ok) {
+      trackAuth('signup')
       setScope('personal')
       setRootsKey((k) => k + 1)
       await plant.reload()
@@ -81,6 +95,7 @@ export default function App() {
   const handleLogin = async (input: { email: string; password: string }) => {
     const ok = await auth.login(input)
     if (ok) {
+      trackAuth('login')
       setScope('personal')
       await plant.reload()
       await refreshCompete()
@@ -89,6 +104,7 @@ export default function App() {
   }
 
   const handleCompete = () => {
+    trackCtaClick('compete_against_me', '#tend')
     setScope('personal')
     document.getElementById('tend')?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -111,10 +127,14 @@ export default function App() {
         activeEffect={plant.activeEffect}
         onTend={async (action) => {
           await plant.tend(action)
+          trackCareAction(action, scope)
           await refreshCompete()
         }}
         onEffectComplete={plant.clearEffect}
-        onSoundToggle={plant.setSoundEnabled}
+        onSoundToggle={(enabled) => {
+          plant.setSoundEnabled(enabled)
+          trackSoundToggle(enabled)
+        }}
         apiError={plant.apiError}
         busy={plant.busy}
         user={auth.user}
@@ -124,6 +144,7 @@ export default function App() {
         onLogin={handleLogin}
         onLogout={async () => {
           await auth.logout()
+          trackAuth('logout')
           setScope('global')
           await plant.reload()
           await refreshCompete()
