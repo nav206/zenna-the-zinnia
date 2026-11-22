@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'motion/react'
 import zennaWordmark from '../assets/illustrations/zenna-wordmark-frida.jpg'
 import type { CareActionId, PlantMood } from '../hooks/usePlantMood'
+import { trackCtaClick } from '../lib/analytics'
 import { MeetPlantCard } from './MeetPlantCard'
 
 type MeetSectionProps = {
@@ -55,10 +56,18 @@ export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.28 }}
         >
-          <a className="cta cta--primary" href="#grow">
+          <a
+            className="cta cta--primary"
+            href="#grow"
+            onClick={() => trackCtaClick('watch_her_grow', '#grow')}
+          >
             Watch her grow
           </a>
-          <a className="cta cta--ghost" href="#compete">
+          <a
+            className="cta cta--ghost"
+            href="#compete"
+            onClick={() => trackCtaClick('compete_against_me', '#compete')}
+          >
             Compete against me
           </a>
         </motion.div>

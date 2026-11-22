@@ -80,8 +80,45 @@ npm run preview
 | `DATABASE_URL` | Postgres (required for real accounts / global persistence) |
 | `DATABASE_URL_UNPOOLED` | Optional direct URL for migrations behind a pooler |
 | `SESSION_SECRET` | Cookie signing (≥16 chars). Required for auth in production |
+| `VITE_GA_MEASUREMENT_ID` | Optional Google Analytics 4 ID (`G-…`). Leave blank to disable |
 
 Copy `.env.example` for local reference only — never commit real secrets.
+
+## Analytics (Google Analytics 4)
+
+Free GA4 covers visitors, geography/device, engagement time, and custom events. Demographics (age/gender/interests) appear after you turn on **Google signals** in the GA property.
+
+### 1. Create a GA4 property
+
+1. Open [Google Analytics](https://analytics.google.com) → **Admin** → **Create property**
+2. Add a **Web** data stream for `https://zenna-the-zinnia.vercel.app`
+3. Copy the **Measurement ID** (`G-XXXXXXXXXX`)
+
+### 2. Set the env var on Vercel
+
+1. Project → **Settings** → **Environment Variables**
+2. Add `VITE_GA_MEASUREMENT_ID` = your Measurement ID (Production + Preview)
+3. Redeploy so Vite bakes the ID into the client bundle
+
+Locally you can put the same key in `.env` (see `.env.example`). With no ID set, analytics is a no-op.
+
+### 3. Optional: demographics + DebugView
+
+- **Admin → Data settings → Data collection** → enable **Google signals** for age/gender/interest reports (needs enough traffic; may take 24–48h)
+- Use GA **Admin → DebugView** while testing; filter Realtime by your events
+
+### Events this site sends
+
+| Event | When |
+| --- | --- |
+| `page_view` | First load (gtag `config`) |
+| `section_view` | Meet / Grow / Compete / Tend / Roots first enter viewport |
+| `cta_click` | Hero, grow handoff, and compete CTAs |
+| `care_action` | Water / prune / sunlight / sing / deadhead |
+| `scope_change` | Global ↔ personal plot toggle |
+| `auth_signup` / `auth_login` / `auth_logout` | Auth success |
+| `plant_card_flip` | Portrait flip |
+| `sound_toggle` | Sing sound checkbox |
 
 
 ## Project layout
@@ -93,7 +130,7 @@ migrations/       SQL schema (additive)
 src/
   components/     Meet, Grow, Compete, Tend, FooterRoots, PlantStage
   hooks/          usePlantMood, useAuth
-  lib/            api client, singAudio
+  lib/            api client, analytics, singAudio
   data/growth.json
 scripts/migrate.mjs
 ```
