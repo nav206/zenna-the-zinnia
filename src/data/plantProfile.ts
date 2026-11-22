@@ -19,7 +19,7 @@ export const plantProfile = {
     },
     {
       title: 'Daily tan',
-      detail: '6–8 hrs of sunlight',
+      detail: '6–8 hrs of daily sunlight',
     },
     {
       title: 'Space',
