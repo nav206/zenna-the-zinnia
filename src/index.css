@@ -377,6 +377,10 @@ code {
   min-height: clamp(260px, 42vh, 460px);
 }
 
+.plant-stage--talkative {
+  padding-top: 2.75rem;
+}
+
 .plant-stage__glow {
   position: absolute;
   inset: 12% 8%;
@@ -393,6 +397,7 @@ code {
 
 .plant-stage__frame {
   position: relative;
+  z-index: 1;
   width: min(100%, 420px);
   aspect-ratio: 4 / 5;
   border-radius: 42% 42% 36% 36% / 38% 38% 48% 48%;
@@ -462,10 +467,9 @@ code {
 
 .plant-stage__bubble {
   position: absolute;
-  z-index: 20;
-  top: 0.35rem;
+  z-index: 30;
+  top: 0.15rem;
   left: 50%;
-  translate: -50% 0;
   margin: 0;
   max-width: min(17rem, 92%);
   padding: 0.6rem 0.95rem;

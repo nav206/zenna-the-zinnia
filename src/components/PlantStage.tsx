@@ -314,16 +314,24 @@ export function PlantStage({
         )}
       </motion.div>
 
-      {/* Outside the clipped oval so quotes can spill into the foreground. */}
+      {/* Outside the clipped oval — sits above the frame in the foreground. */}
       <AnimatePresence>
         {quote && (
           <motion.p
             key={quote}
             className="plant-stage__bubble"
             role="status"
-            initial={reduceMotion ? false : { opacity: 0, y: 8, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduceMotion ? undefined : { opacity: 0, y: 6, scale: 0.98 }}
+            initial={
+              reduceMotion
+                ? false
+                : { opacity: 0, y: 10, scale: 0.96, x: '-50%' }
+            }
+            animate={{ opacity: 1, y: 0, scale: 1, x: '-50%' }}
+            exit={
+              reduceMotion
+                ? undefined
+                : { opacity: 0, y: 6, scale: 0.98, x: '-50%' }
+            }
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
             {quote}
