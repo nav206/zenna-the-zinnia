@@ -34,7 +34,7 @@ export function CompeteSection({
       label: 'IRL Zenna',
       detail: diary.stats
         ? `${diary.stats.flowers} blooms · ${diary.weeks.at(-1)?.heightCm ?? '—'} cm`
-        : 'Canonical diary in growth.json',
+        : 'Her real-world diary',
       score: irlCareProxy,
       accent: 'petal' as const,
     },
@@ -68,11 +68,21 @@ export function CompeteSection({
     >
       <div className="chapter__inner">
         <p className="eyebrow">Compete</p>
-        <h2 id="compete-title">Against me — and my Zenna IRL</h2>
-        <p className="section-lede">
-          The diary is the real plant. Global Zenna gathers every visitor’s
-          care. Your account grows a personal plot you can stack against both.
-        </p>
+        <h2 id="compete-title">Pick your own adventure</h2>
+        <div className="section-lede compete-lede">
+          <p>
+            Grow your very own plant: name it, tame it, witness it grow, and{' '}
+            <strong>compete</strong> against me and my IRL Zenna{' '}
+            <span className="compete-lede__note">(requires email sign-in)</span>.
+          </p>
+          <p>
+            Or simply interact with Global Zenna — a shared plot that is the sum
+            of every visitor on this page.
+          </p>
+          <p className="compete-lede__ps">
+            P.S. Your personal care contributes to global statistics as well.
+          </p>
+        </div>
 
         <ul className="compete-grid" role="list">
           {rows.map((row, index) => (

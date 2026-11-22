@@ -54,6 +54,8 @@ type TendSectionProps = {
   onSoundToggle: (enabled: boolean) => void
   apiError: string | null
   busy: boolean
+  /** Individual contribution: session (guest) or personal total (signed in). */
+  yourCareMoments: number
   user: ApiUser | null
   authLoading: boolean
   authError: string | null
@@ -78,6 +80,7 @@ export function TendSection({
   onSoundToggle,
   apiError,
   busy,
+  yourCareMoments,
   user,
   authLoading,
   authError,
@@ -109,10 +112,9 @@ export function TendSection({
           <p className="eyebrow">Tend</p>
           <h2 id="tend-title">Now that you know her</h2>
           <p className="section-lede">
-            Visitors can freely tend Global Zenna. Your own plot needs an
-            account — and starts as a seedling. Water, sunlight, and song first;
-            prune and deadhead unlock as she grows. Personal care also feeds
-            the global garden.
+            Care for the shared plot freely, or sign in for a seedling of your
+            own. Water, sunlight, and song first; prune and deadhead unlock as
+            she grows.
           </p>
 
           <div className="tend-modes" role="tablist" aria-label="Which Zenna to tend">
@@ -161,7 +163,10 @@ export function TendSection({
           {!needsAuth && (
             <div className="tend-status" aria-live="polite">
               <span className="tend-status__stat">
-                Care moments <strong>{mood.totalCare}</strong>
+                Your care <strong>{yourCareMoments}</strong>
+                <em className="tend-status__hint">
+                  {user ? 'all-time' : 'this session'}
+                </em>
               </span>
               {scope === 'personal' && (
                 <span className="tend-status__stat">

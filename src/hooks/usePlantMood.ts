@@ -216,18 +216,18 @@ export function usePlantMood(opts: {
   }, [])
 
   const tend = useCallback(
-    async (action: CareActionId) => {
-      if (busy || activeEffect) return
+    async (action: CareActionId): Promise<boolean> => {
+      if (busy || activeEffect) return false
       if (opts.scope === 'personal' && !opts.authed) {
         setApiError('Sign in to tend your own Zenna.')
-        return
+        return false
       }
       if (
         opts.scope === 'personal' &&
         !mood.unlockedActions.includes(action)
       ) {
         setApiError('Your plant needs to grow before that care action.')
-        return
+        return false
       }
       setBusy(true)
       setApiError(null)
@@ -235,7 +235,7 @@ export function usePlantMood(opts: {
       setBusy(false)
       if (res.error || !res.data) {
         setApiError(res.error || 'Care action failed.')
-        return
+        return false
       }
       setMood((prev) => ({
         ...fromApi(res.data!.plant, prev.soundEnabled, prev),
@@ -243,6 +243,7 @@ export function usePlantMood(opts: {
         lastAt: Date.now(),
       }))
       setActiveEffect(action)
+      return true
     },
     [
       activeEffect,

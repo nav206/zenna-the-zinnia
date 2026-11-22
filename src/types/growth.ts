@@ -11,7 +11,6 @@ export type PlantStats = {
   sunbathingHours: number
   waterDrunkMl: number
   leavesGrown: number
-  leavesShed: number
   buds: number
   flowers: number
   updated: string

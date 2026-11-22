@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
-import { useId, useState } from 'react'
+import { useId, useState, type MouseEvent } from 'react'
 import heroArt from '../assets/illustrations/zenna-plant-hero.jpg'
 import { plantProfile } from '../data/plantProfile'
 import type { CareActionId, PlantMood } from '../hooks/usePlantMood'
@@ -9,6 +9,7 @@ import { trackPlantCardFlip } from '../lib/analytics'
 type MeetPlantCardProps = {
   mood: PlantMood
   activeEffect: CareActionId | null
+  onEgg?: (message: string) => void
 }
 
 function FlipIcon({ className }: { className?: string }) {
@@ -33,9 +34,14 @@ function FlipIcon({ className }: { className?: string }) {
   )
 }
 
-export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
+export function MeetPlantCard({
+  mood,
+  activeEffect,
+  onEgg,
+}: MeetPlantCardProps) {
   const reduceMotion = useReducedMotion()
   const [flipped, setFlipped] = useState(false)
+  const [moodClicks, setMoodClicks] = useState(0)
   const titleId = useId()
   const label = moodLabel(mood)
 
@@ -43,6 +49,21 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
     const next = !flipped
     setFlipped(next)
     trackPlantCardFlip(next)
+  }
+
+  function onMoodClick(e: MouseEvent) {
+    e.stopPropagation()
+    const next = moodClicks + 1
+    setMoodClicks(next)
+    if (next === 5) {
+      onEgg?.('You found a petal. Three more quiet finds hide on this page.')
+      setMoodClicks(0)
+    }
+  }
+
+  function onFunFactClick(e: MouseEvent) {
+    e.stopPropagation()
+    onEgg?.("It's super effective!")
   }
 
   return (
@@ -126,7 +147,11 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
                   draggable={false}
                 />
               </motion.span>
-              <span className="plant-stage__mood">
+              <span
+                className="plant-stage__mood"
+                onClick={onMoodClick}
+                role="presentation"
+              >
                 <span className="plant-stage__mood-label">{label}</span>
               </span>
             </span>
@@ -153,13 +178,15 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
             }
           >
             <span className="dex-card">
-              <span className="dex-card__top">
-                <span className="dex-card__name">{plantProfile.commonName}</span>
-                <span className="dex-card__type">{plantProfile.type}</span>
+              <span className="dex-card__header">
+                <span className="dex-card__species-name">
+                  <em>{plantProfile.scientificName}</em>
+                </span>
+                <span className="dex-card__common">
+                  ({plantProfile.commonName})
+                </span>
               </span>
-              <span className="dex-card__species">
-                <em>{plantProfile.scientificName}</em>
-              </span>
+
               <span className="dex-card__portrait">
                 <img
                   src={heroArt}
@@ -169,41 +196,47 @@ export function MeetPlantCard({ mood, activeEffect }: MeetPlantCardProps) {
                   draggable={false}
                 />
               </span>
-              <span className="dex-card__tax">
-                {plantProfile.order} · {plantProfile.family} · {plantProfile.genus}
-                <br />
-                {plantProfile.origin}
-              </span>
+
               <span className="dex-card__block">
                 <span className="dex-card__label">Needs</span>
-                <span className="dex-card__chips">
+                <ul className="dex-card__lines">
                   {plantProfile.needs.map((item) => (
-                    <span key={item}>{item}</span>
+                    <li key={item.title}>
+                      <strong>{item.title}:</strong> {item.detail}
+                    </li>
                   ))}
-                </span>
+                </ul>
               </span>
+
               <span className="dex-card__block">
                 <span className="dex-card__label">Strengths</span>
-                <span className="dex-card__chips">
+                <ul className="dex-card__lines">
                   {plantProfile.strengths.map((item) => (
-                    <span key={item}>{item}</span>
+                    <li key={item.title}>
+                      <strong>{item.title}:</strong> {item.detail}
+                    </li>
                   ))}
-                </span>
+                </ul>
               </span>
+
               <span className="dex-card__block">
                 <span className="dex-card__label">Weaknesses</span>
-                <span className="dex-card__chips">
+                <ul className="dex-card__lines">
                   {plantProfile.weaknesses.map((item) => (
-                    <span key={item}>{item}</span>
+                    <li key={item.title}>
+                      <strong>{item.title}:</strong> {item.detail}
+                    </li>
                   ))}
-                </span>
+                </ul>
               </span>
+
               <span className="dex-card__block">
-                <span className="dex-card__label">Field notes</span>
-                <span className="dex-card__chips">
-                  {plantProfile.funFacts.map((item) => (
-                    <span key={item}>{item}</span>
-                  ))}
+                <span className="dex-card__label">Fun fact</span>
+                <span
+                  className="dex-card__funfact"
+                  onClick={onFunFactClick}
+                >
+                  {plantProfile.funFact}
                 </span>
               </span>
             </span>

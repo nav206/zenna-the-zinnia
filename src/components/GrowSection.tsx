@@ -28,8 +28,8 @@ const STAT_ROWS = diary.stats
         value: `${diary.stats.waterDrunkMl.toLocaleString()} ml`,
       },
       {
-        label: 'Leaves grown / shed',
-        value: `${diary.stats.leavesGrown} / ${diary.stats.leavesShed}`,
+        label: 'Leaves',
+        value: `${diary.stats.leavesGrown}`,
       },
       {
         label: 'Buds & flowers',
@@ -50,9 +50,8 @@ export function GrowSection() {
         <p className="eyebrow">Grow</p>
         <h2 id="grow-title">Weeks of becoming</h2>
         <p className="section-lede">
-          The record first — {diary.plant.name} ({diary.plant.species}), adopted{' '}
-          {diary.plant.adopted}. Real checkpoints; edit{' '}
-          <code>src/data/growth.json</code> when she changes again.
+          {diary.plant.name} ({diary.plant.species}), adopted{' '}
+          {diary.plant.adopted}.
         </p>
       </div>
 
@@ -159,13 +158,16 @@ export function GrowSection() {
       </div>
 
       <div className="grow-handoff">
-        <p>Now that you’ve seen her weeks —</p>
+        <p>
+          Now that you’ve seen her growth over a month — aren’t{' '}
+          <em>you</em> excited to have your own plant?
+        </p>
         <a
           className="cta cta--primary"
           href="#tend"
-          onClick={() => trackCtaClick('tend_zenna', '#tend')}
+          onClick={() => trackCtaClick('tend_a_zinnia', '#tend')}
         >
-          Tend Zenna
+          Tend a Zinnia
         </a>
       </div>
     </section>
