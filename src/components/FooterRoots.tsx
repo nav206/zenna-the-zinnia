@@ -8,7 +8,7 @@ const SOURCES = [
     href: 'https://www.almanac.com/plant/zinnias',
   },
   {
-    label: 'Back to the project write-up',
+    label: 'Story behind the project',
     href: 'https://sidesofnav.pages.dev/projects/zenna-the-zinnia/',
   },
 ] as const
@@ -140,8 +140,9 @@ export function FooterRoots({
         </div>
 
         <p className="footer-sources__note">
-          If this reminded you of someone — buy them flowers, or send them this
-          page.
+          If this reminded you of someone —
+          <br />
+          buy them flowers, or send them this page.
         </p>
       </div>
     </footer>
