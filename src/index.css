@@ -1333,47 +1333,43 @@ code {
   font-size: 1.02rem;
 }
 
-.chapter--sources {
-  padding-top: 1.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.sources {
+.footer-sources {
+  margin-top: 1.15rem;
   max-width: 34rem;
 }
 
-.sources h5 {
+.footer-sources__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 520;
   color: var(--ink);
 }
 
-.sources__list {
-  margin: 0.65rem 0 0;
+.footer-sources__list {
+  margin: 0.55rem 0 0;
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 0.35rem;
+  gap: 0.3rem;
 }
 
-.sources__list a {
+.footer-sources__list a {
   color: var(--ink-muted);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
 }
 
-.sources__list a:hover {
+.footer-sources__list a:hover {
   color: var(--petal);
 }
 
-.sources__note {
-  margin: 0.9rem 0 0;
+.footer-sources__note {
+  margin: 0.75rem 0 0;
   max-width: 40ch;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   line-height: 1.45;
   color: var(--ink-muted);
   font-style: italic;

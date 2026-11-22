@@ -2,6 +2,17 @@ import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { fetchRootsStats } from '../lib/api'
 
+const SOURCES = [
+  {
+    label: 'Zinnia — Wikipedia',
+    href: 'https://en.wikipedia.org/wiki/Zinnia',
+  },
+  {
+    label: 'Zinnias — Old Farmer’s Almanac',
+    href: 'https://www.almanac.com/plant/zinnias',
+  },
+] as const
+
 function rootPath(i: number, total: number, strength: number) {
   const t = total <= 1 ? 0.5 : i / (total - 1)
   const startX = 8 + t * 84
@@ -94,6 +105,7 @@ export function FooterRoots({
           ))}
         </svg>
       </div>
+
       <div className="site-footer__copy">
         <p className="site-footer__gardeners">
           {ready
@@ -111,7 +123,23 @@ export function FooterRoots({
             </a>
           )}
         </p>
-        <p>Zenna, the Zinnia — growth story &amp; care garden</p>
+
+        <div className="footer-sources" id="sources">
+          <h5 className="footer-sources__title">Learn more about zinnias</h5>
+          <ul className="footer-sources__list" role="list">
+            {SOURCES.map((source) => (
+              <li key={source.href}>
+                <a href={source.href} target="_blank" rel="noreferrer">
+                  {source.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="footer-sources__note">
+            If this reminded you of someone — buy them flowers, or send them
+            this page.
+          </p>
+        </div>
       </div>
     </footer>
   )

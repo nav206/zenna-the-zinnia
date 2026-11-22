@@ -4,7 +4,6 @@ import { EggToast } from './components/EggToast'
 import { FooterRoots } from './components/FooterRoots'
 import { GrowSection } from './components/GrowSection'
 import { MeetSection } from './components/MeetSection'
-import { SourcesSection } from './components/SourcesSection'
 import { TendSection } from './components/TendSection'
 import { useAuth } from './hooks/useAuth'
 import { usePlantMood, type PlantScope } from './hooks/usePlantMood'
@@ -213,7 +212,6 @@ export default function App() {
         }}
         onClearAuthError={() => auth.setError(null)}
       />
-      <SourcesSection />
       <FooterRoots
         refreshKey={rootsKey}
         onJoin={handleJoin}

@@ -1,4 +1,4 @@
-/** Dex facts for Meet — witty chips, card-tight. */
+/** Dex facts for Meet — witty chips, still readable. */
 
 /** Spoken when the Tend-stage plant is clicked. */
 export const PLANT_QUOTES = [
@@ -6,6 +6,9 @@ export const PLANT_QUOTES = [
   'Feeling Zen? Or nah?',
   'Sun! Sun! Sun! We follow orders, sun, or plants die.',
   'Ama-zinnia-ing!!!!!',
+  'Water me like you mean it — not like a monsoon.',
+  'Deadhead me and I’ll throw a rematch bloom.',
+  'Shade? In this economy? Absolutely not.',
 ] as const
 
 export const plantProfile = {
@@ -18,11 +21,11 @@ export const plantProfile = {
   adopted: '2026-09-26',
   needs: [
     'Sip, don’t swamp',
-    '6–8 hrs of daily tan',
+    '6–8 hrs sun (daily tan)',
     'Elbow room or drama',
   ],
   strengths: [
-    'Multi-species rizz',
+    'Rizz for humans + pollinators',
     'Cut me → encore blooms',
     'Eats soil drama for breakfast',
   ],
