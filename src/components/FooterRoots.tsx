@@ -107,39 +107,42 @@ export function FooterRoots({
       </div>
 
       <div className="site-footer__copy">
-        <p className="site-footer__gardeners">
-          {ready
-            ? signupCount === 0
-              ? 'No gardeners signed up so far.'
-              : `${signupCount} gardener${signupCount === 1 ? '' : 's'} signed up so far.`
-            : 'Counting gardeners…'}{' '}
-          {onJoin ? (
-            <button type="button" className="text-link" onClick={onJoin}>
-              Join them.
-            </button>
-          ) : (
-            <a className="text-link" href="#tend">
-              Join them.
-            </a>
-          )}
-        </p>
-
-        <div className="footer-sources" id="sources">
-          <h5 className="footer-sources__title">Learn more about zinnias</h5>
-          <ul className="footer-sources__list" role="list">
-            {SOURCES.map((source) => (
-              <li key={source.href}>
-                <a href={source.href} target="_blank" rel="noreferrer">
-                  {source.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <p className="footer-sources__note">
-            If this reminded you of someone — buy them flowers, or send them
-            this page.
+        <div className="site-footer__left">
+          <p className="site-footer__gardeners">
+            {ready
+              ? signupCount === 0
+                ? 'No gardeners signed up so far.'
+                : `${signupCount} gardener${signupCount === 1 ? '' : 's'} signed up so far.`
+              : 'Counting gardeners…'}{' '}
+            {onJoin ? (
+              <button type="button" className="text-link" onClick={onJoin}>
+                Join them.
+              </button>
+            ) : (
+              <a className="text-link" href="#tend">
+                Join them.
+              </a>
+            )}
           </p>
+
+          <div className="footer-sources" id="sources">
+            <h5 className="footer-sources__title">Learn more about zinnias</h5>
+            <ul className="footer-sources__list" role="list">
+              {SOURCES.map((source) => (
+                <li key={source.href}>
+                  <a href={source.href} target="_blank" rel="noreferrer">
+                    {source.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
+
+        <p className="footer-sources__note">
+          If this reminded you of someone — buy them flowers, or send them this
+          page.
+        </p>
       </div>
     </footer>
   )
