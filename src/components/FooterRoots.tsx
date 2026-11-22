@@ -140,9 +140,8 @@ export function FooterRoots({
         </div>
 
         <p className="footer-sources__note">
-          If this reminded you of someone —
-          <br />
-          buy them flowers, or send them this page.
+          <span>If this reminded you of someone —</span>
+          <span>buy them flowers, or send them this page.</span>
         </p>
       </div>
     </footer>

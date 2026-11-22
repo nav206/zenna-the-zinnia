@@ -1377,14 +1377,19 @@ code {
 }
 
 .footer-sources__note {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   flex: 0 0 auto;
   margin: 0 0 0.1rem auto;
-  max-width: none;
-  text-align: right;
   font-size: 0.88rem;
   line-height: 1.45;
   color: var(--ink-muted);
   font-style: italic;
+}
+
+.footer-sources__note span {
+  white-space: nowrap;
 }
 
 .egg-toast {
