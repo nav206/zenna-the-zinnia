@@ -2,9 +2,6 @@ import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { fetchRootsStats } from '../lib/api'
 
-const PORTFOLIO_URL =
-  'https://sidesofnav.pages.dev/projects/zenna-the-zinnia/'
-
 function rootPath(i: number, total: number, strength: number) {
   const t = total <= 1 ? 0.5 : i / (total - 1)
   const startX = 8 + t * 84
@@ -59,37 +56,15 @@ export function FooterRoots({
     const next = rootClicks + 1
     setRootClicks(next)
     if (next === 7) {
-      onEgg?.('The soil remembers. Quiet finds count toward a real-plant giveaway.')
+      onEgg?.(
+        'The soil remembers. Quiet finds count toward a real-plant giveaway.',
+      )
       setRootClicks(0)
     }
   }
 
   return (
     <footer className="site-footer site-footer--roots" id="roots">
-      <div className="site-footer__copy">
-        <p className="site-footer__gardeners">
-          {ready
-            ? signupCount === 0
-              ? 'No gardeners signed up so far.'
-              : `${signupCount} gardener${signupCount === 1 ? '' : 's'} signed up so far.`
-            : 'Counting gardeners…'}{' '}
-          {onJoin ? (
-            <button type="button" className="text-link" onClick={onJoin}>
-              Join them.
-            </button>
-          ) : (
-            <a className="text-link" href="#tend">
-              Join them.
-            </a>
-          )}
-        </p>
-        <p className="project-link project-link--footer">
-          <a href={PORTFOLIO_URL} target="_blank" rel="noreferrer">
-            Learn more about the project
-          </a>
-        </p>
-        <p>Zenna, the Zinnia — growth story &amp; care garden</p>
-      </div>
       <div
         className="footer-roots"
         aria-hidden="true"
@@ -118,6 +93,25 @@ export function FooterRoots({
             />
           ))}
         </svg>
+      </div>
+      <div className="site-footer__copy">
+        <p className="site-footer__gardeners">
+          {ready
+            ? signupCount === 0
+              ? 'No gardeners signed up so far.'
+              : `${signupCount} gardener${signupCount === 1 ? '' : 's'} signed up so far.`
+            : 'Counting gardeners…'}{' '}
+          {onJoin ? (
+            <button type="button" className="text-link" onClick={onJoin}>
+              Join them.
+            </button>
+          ) : (
+            <a className="text-link" href="#tend">
+              Join them.
+            </a>
+          )}
+        </p>
+        <p>Zenna, the Zinnia — growth story &amp; care garden</p>
       </div>
     </footer>
   )

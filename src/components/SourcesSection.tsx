@@ -4,10 +4,6 @@ const SOURCES = [
     href: 'https://en.wikipedia.org/wiki/Zinnia',
   },
   {
-    label: 'Deadheading — Wikipedia',
-    href: 'https://en.wikipedia.org/wiki/Deadheading_(botany)',
-  },
-  {
     label: 'Zinnias — Old Farmer’s Almanac',
     href: 'https://www.almanac.com/plant/zinnias',
   },
@@ -21,8 +17,7 @@ export function SourcesSection() {
       aria-labelledby="sources-title"
     >
       <div className="chapter__inner sources">
-        <p className="eyebrow">Sources</p>
-        <h2 id="sources-title">Sources you might enjoy</h2>
+        <h5 id="sources-title">Learn more about zinnias</h5>
         <ul className="sources__list" role="list">
           {SOURCES.map((source) => (
             <li key={source.href}>
@@ -34,7 +29,7 @@ export function SourcesSection() {
         </ul>
         <p className="sources__note">
           If this reminded you of someone — buy them flowers, or send them this
-          page. Small care travels farther than tabs.
+          page.
         </p>
       </div>
     </section>

@@ -252,6 +252,7 @@ export function TendSection({
           activeEffect={activeEffect}
           onEffectComplete={onEffectComplete}
           compact
+          talkative={!needsAuth}
         />
       </div>
     </section>

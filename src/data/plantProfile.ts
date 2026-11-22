@@ -1,8 +1,16 @@
-/** Dex / trading-card facts for Meet — concise field-guide copy. */
+/** Dex / trading-card facts for Meet — card-tight copy (no scroll). */
 export type ProfileLine = {
   title: string
   detail: string
 }
+
+/** Spoken when the Tend-stage plant is clicked. */
+export const PLANT_QUOTES = [
+  'If I were a Pokémon, Grass would be my type.',
+  'Feeling Zen? Or nah?',
+  'Sun! Sun! Sun! We follow orders, sun, or plants die.',
+  'Ama-zinnia-ing!!!!!',
+] as const
 
 export const plantProfile = {
   commonName: 'Common zinnia',
@@ -13,42 +21,20 @@ export const plantProfile = {
   origin: 'Mexico → windowsills worldwide',
   adopted: '2026-09-26',
   needs: [
-    {
-      title: 'To breathe',
-      detail: 'soil that can drain',
-    },
-    {
-      title: 'Daily tan',
-      detail: '6–8 hrs of daily sunlight',
-    },
-    {
-      title: 'Space',
-      detail: 'cannot be crammed with other plants or zinnias',
-    },
+    { title: 'Breathe', detail: 'draining soil' },
+    { title: 'Sun', detail: '6–8 hrs daily' },
+    { title: 'Space', detail: 'don’t crowd other plants' },
   ] as const satisfies readonly ProfileLine[],
   strengths: [
     {
       title: 'Attractive',
-      detail: 'not just to humans — pollinators alike (multi-species rizz)',
+      detail: 'humans + pollinators (multi-species rizz)',
     },
-    {
-      title: 'Comeback',
-      detail: 'the more you cut it, the greater its blooms',
-    },
-    {
-      title: 'Adaptability',
-      detail: 'takes temperature, pH, soil changes like different cuisine meals',
-    },
+    { title: 'Comeback', detail: 'cut more → bloom more' },
+    { title: 'Adaptability', detail: 'temp, pH, soil like cuisine' },
   ] as const satisfies readonly ProfileLine[],
   weaknesses: [
-    {
-      title: 'Salinity',
-      detail: 'salt water is a no-go (no beach days for Zenna)',
-    },
-    {
-      title: 'Sickness',
-      detail: 'can get wet rot; powdery mildew on wet leaves',
-    },
+    { title: 'Salinity', detail: 'no salt water / beach days' },
+    { title: 'Sickness', detail: 'wet rot; mildew on wet leaves' },
   ] as const satisfies readonly ProfileLine[],
-  funFact: 'If I were a Pokémon, Grass would be my type.',
 } as const

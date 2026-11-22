@@ -56,14 +56,9 @@ export function MeetPlantCard({
     const next = moodClicks + 1
     setMoodClicks(next)
     if (next === 5) {
-      onEgg?.('You found a petal. Three more quiet finds hide on this page.')
+      onEgg?.('You found a petal. Quiet finds hide on this page.')
       setMoodClicks(0)
     }
-  }
-
-  function onFunFactClick(e: MouseEvent) {
-    e.stopPropagation()
-    onEgg?.("It's super effective!")
   }
 
   return (
@@ -228,16 +223,6 @@ export function MeetPlantCard({
                     </li>
                   ))}
                 </ul>
-              </span>
-
-              <span className="dex-card__block">
-                <span className="dex-card__label">Fun fact</span>
-                <span
-                  className="dex-card__funfact"
-                  onClick={onFunFactClick}
-                >
-                  {plantProfile.funFact}
-                </span>
               </span>
             </span>
           </motion.span>
