@@ -4,12 +4,12 @@ import { fetchRootsStats } from '../lib/api'
 
 const SOURCES = [
   {
-    label: 'Zinnia — Wikipedia',
-    href: 'https://en.wikipedia.org/wiki/Zinnia',
-  },
-  {
     label: 'Zinnias — Old Farmer’s Almanac',
     href: 'https://www.almanac.com/plant/zinnias',
+  },
+  {
+    label: 'Back to the project write-up',
+    href: 'https://sidesofnav.pages.dev/projects/zenna-the-zinnia/',
   },
 ] as const
 
@@ -126,7 +126,7 @@ export function FooterRoots({
           </p>
 
           <div className="footer-sources" id="sources">
-            <h5 className="footer-sources__title">Learn more about zinnias</h5>
+            <h5 className="footer-sources__title">Learn more</h5>
             <ul className="footer-sources__list" role="list">
               {SOURCES.map((source) => (
                 <li key={source.href}>
