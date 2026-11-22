@@ -26,13 +26,15 @@ export function initAnalytics() {
   booted = true
 
   window.dataLayer = window.dataLayer ?? []
-  window.gtag = function gtag(...args: unknown[]) {
-    window.dataLayer?.push(args)
+  // Google's loader only processes Arguments objects in dataLayer — not
+  // Arrays from rest params. Official snippet: dataLayer.push(arguments).
+  window.gtag = function gtag() {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer!.push(arguments)
   }
 
   window.gtag('js', new Date())
   window.gtag('config', MEASUREMENT_ID, {
-    anonymize_ip: true,
     send_page_view: true,
   })
 
