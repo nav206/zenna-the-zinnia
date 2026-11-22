@@ -49,10 +49,6 @@ export function GrowSection() {
       <div className="grow-intro">
         <p className="eyebrow">Grow</p>
         <h2 id="grow-title">Weeks of becoming</h2>
-        <p className="section-lede">
-          {diary.plant.name} ({diary.plant.species}), adopted{' '}
-          {diary.plant.adopted}.
-        </p>
       </div>
 
       {diary.stats && (

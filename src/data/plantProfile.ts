@@ -1,8 +1,4 @@
-/** Dex / trading-card facts for Meet — card-tight copy (no scroll). */
-export type ProfileLine = {
-  title: string
-  detail: string
-}
+/** Dex facts for Meet — witty chips, card-tight. */
 
 /** Spoken when the Tend-stage plant is clicked. */
 export const PLANT_QUOTES = [
@@ -21,20 +17,17 @@ export const plantProfile = {
   origin: 'Mexico → windowsills worldwide',
   adopted: '2026-09-26',
   needs: [
-    { title: 'Breathe', detail: 'draining soil' },
-    { title: 'Sun', detail: '6–8 hrs daily' },
-    { title: 'Space', detail: 'don’t crowd other plants' },
-  ] as const satisfies readonly ProfileLine[],
+    'Sip, don’t swamp',
+    '6–8 hrs of daily tan',
+    'Elbow room or drama',
+  ],
   strengths: [
-    {
-      title: 'Attractive',
-      detail: 'humans + pollinators (multi-species rizz)',
-    },
-    { title: 'Comeback', detail: 'cut more → bloom more' },
-    { title: 'Adaptability', detail: 'temp, pH, soil like cuisine' },
-  ] as const satisfies readonly ProfileLine[],
+    'Multi-species rizz',
+    'Cut me → encore blooms',
+    'Eats soil drama for breakfast',
+  ],
   weaknesses: [
-    { title: 'Salinity', detail: 'no salt water / beach days' },
-    { title: 'Sickness', detail: 'wet rot; mildew on wet leaves' },
-  ] as const satisfies readonly ProfileLine[],
+    'No beach days (salt = nope)',
+    'Wet leaves → mildew arc',
+  ],
 } as const

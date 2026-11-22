@@ -182,47 +182,31 @@ export function MeetPlantCard({
                 </span>
               </span>
 
-              <span className="dex-card__portrait">
-                <img
-                  src={heroArt}
-                  alt=""
-                  width={216}
-                  height={288}
-                  draggable={false}
-                />
-              </span>
-
               <span className="dex-card__block">
                 <span className="dex-card__label">Needs</span>
-                <ul className="dex-card__lines">
+                <span className="dex-card__chips">
                   {plantProfile.needs.map((item) => (
-                    <li key={item.title}>
-                      <strong>{item.title}:</strong> {item.detail}
-                    </li>
+                    <span key={item}>{item}</span>
                   ))}
-                </ul>
+                </span>
               </span>
 
               <span className="dex-card__block">
                 <span className="dex-card__label">Strengths</span>
-                <ul className="dex-card__lines">
+                <span className="dex-card__chips">
                   {plantProfile.strengths.map((item) => (
-                    <li key={item.title}>
-                      <strong>{item.title}:</strong> {item.detail}
-                    </li>
+                    <span key={item}>{item}</span>
                   ))}
-                </ul>
+                </span>
               </span>
 
               <span className="dex-card__block">
                 <span className="dex-card__label">Weaknesses</span>
-                <ul className="dex-card__lines">
+                <span className="dex-card__chips">
                   {plantProfile.weaknesses.map((item) => (
-                    <li key={item.title}>
-                      <strong>{item.title}:</strong> {item.detail}
-                    </li>
+                    <span key={item}>{item}</span>
                   ))}
-                </ul>
+                </span>
               </span>
             </span>
           </motion.span>

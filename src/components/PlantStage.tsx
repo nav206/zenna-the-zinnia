@@ -307,28 +307,29 @@ export function PlantStage({
           )}
         </AnimatePresence>
 
-        <AnimatePresence>
-          {quote && (
-            <motion.p
-              key={quote}
-              className="plant-stage__bubble"
-              role="status"
-              initial={reduceMotion ? false : { opacity: 0, y: 8, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={reduceMotion ? undefined : { opacity: 0, y: 6, scale: 0.98 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {quote}
-            </motion.p>
-          )}
-        </AnimatePresence>
-
         {label && (
           <p className="plant-stage__mood">
             <span className="plant-stage__mood-label">{label}</span>
           </p>
         )}
       </motion.div>
+
+      {/* Outside the clipped oval so quotes can spill into the foreground. */}
+      <AnimatePresence>
+        {quote && (
+          <motion.p
+            key={quote}
+            className="plant-stage__bubble"
+            role="status"
+            initial={reduceMotion ? false : { opacity: 0, y: 8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduceMotion ? undefined : { opacity: 0, y: 6, scale: 0.98 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {quote}
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
