@@ -1156,6 +1156,11 @@ code {
   font-size: 0.9rem;
 }
 
+.tend-error--hint {
+  max-width: 42ch;
+  line-height: 1.45;
+}
+
 .auth-form__info {
   margin: 0.85rem 0 0;
   color: var(--leaf);

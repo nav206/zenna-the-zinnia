@@ -13,6 +13,7 @@ type MeetSectionProps = {
   activeEffect: CareActionId | null
   onEgg?: (message: string) => void
   onPortraitFlipEgg?: () => void
+  onGrowOwn?: () => void
 }
 
 export function MeetSection({
@@ -20,6 +21,7 @@ export function MeetSection({
   activeEffect,
   onEgg,
   onPortraitFlipEgg,
+  onGrowOwn,
 }: MeetSectionProps) {
   const reduceMotion = useReducedMotion()
   const [markClicks, setMarkClicks] = useState(0)
@@ -99,7 +101,11 @@ export function MeetSection({
           <a
             className="cta cta--ghost"
             href="#tend"
-            onClick={() => trackCtaClick('grow_my_own_zinnia', '#tend')}
+            onClick={(e) => {
+              e.preventDefault()
+              trackCtaClick('grow_my_own_zinnia', '#tend')
+              onGrowOwn?.()
+            }}
           >
             Grow my own Zinnia
           </a>

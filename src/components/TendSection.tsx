@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
+import { useState } from 'react'
 import type { ApiUser } from '../lib/api'
 import type { CareActionId, PlantMood, PlantScope } from '../hooks/usePlantMood'
 import { playSingChime } from '../lib/singAudio'
@@ -115,9 +116,17 @@ export function TendSection({
 }: TendSectionProps) {
   const reduceMotion = useReducedMotion()
   const needsAuth = scope === 'personal' && !user
+  const [authCareHint, setAuthCareHint] = useState<string | null>(null)
 
   async function handleAction(id: CareActionId) {
-    if (activeEffect || busy || needsAuth) return
+    if (activeEffect || busy) return
+    if (needsAuth) {
+      setAuthCareHint(
+        'Sign in to complete this care action, or switch to Care for Global to interact without an account.',
+      )
+      return
+    }
+    setAuthCareHint(null)
     if (scope === 'personal' && !mood.unlockedActions.includes(id)) return
     if (id === 'sing' && mood.soundEnabled) {
       try {
@@ -146,7 +155,10 @@ export function TendSection({
               role="tab"
               aria-selected={scope === 'global'}
               className={scope === 'global' ? 'is-active' : ''}
-              onClick={() => onScopeChange('global')}
+              onClick={() => {
+                setAuthCareHint(null)
+                onScopeChange('global')
+              }}
             >
               Care for Global
             </button>
@@ -155,7 +167,10 @@ export function TendSection({
               role="tab"
               aria-selected={scope === 'personal'}
               className={scope === 'personal' ? 'is-active' : ''}
-              onClick={() => onScopeChange('personal')}
+              onClick={() => {
+                setAuthCareHint(null)
+                onScopeChange('personal')
+              }}
             >
               Care for Mine
             </button>
@@ -185,7 +200,7 @@ export function TendSection({
                 ? `Personal plot — ${plantName || user.displayName} · ${mood.growthStage}`
                 : 'Personal plot — sign in to begin'}
             {' · '}
-            {daytime ? 'Local day' : 'Local night'}
+            {daytime ? 'Daytime detected' : 'Nighttime detected'}
           </p>
 
           {!needsAuth && (
@@ -221,6 +236,11 @@ export function TendSection({
               {apiError}
             </p>
           )}
+          {authCareHint && (
+            <p className="tend-error tend-error--hint" role="status">
+              {authCareHint}
+            </p>
+          )}
 
           <label className="sound-toggle">
             <input
@@ -238,8 +258,7 @@ export function TendSection({
                 scope === 'personal' &&
                 !needsAuth &&
                 !mood.unlockedActions.includes(action.id)
-              const disabled =
-                Boolean(activeEffect) || busy || needsAuth || locked
+              const disabled = Boolean(activeEffect) || busy || locked
 
               return (
                 <li key={action.id}>
@@ -247,7 +266,9 @@ export function TendSection({
                     type="button"
                     className={`care-action care-action--live${
                       activeEffect === action.id ? ' is-active' : ''
-                    }${locked ? ' is-locked' : ''}`}
+                    }${locked ? ' is-locked' : ''}${
+                      needsAuth ? ' care-action--needs-auth' : ''
+                    }`}
                     disabled={disabled}
                     onClick={() => void handleAction(action.id)}
                     initial={reduceMotion ? false : { opacity: 0, y: 10 }}

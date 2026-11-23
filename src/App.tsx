@@ -202,6 +202,11 @@ export default function App() {
     document.getElementById('tend')?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const handleGrowOwn = () => {
+    setScope('personal')
+    document.getElementById('tend')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   const yourCareMoments = auth.user
     ? (auth.personalPlant?.totalCare ??
       (scope === 'personal' ? plant.mood.totalCare : 0))
@@ -214,6 +219,7 @@ export default function App() {
         activeEffect={plant.activeEffect}
         onEgg={showEgg}
         onPortraitFlipEgg={() => achievements.noteEgg('flip_portrait')}
+        onGrowOwn={handleGrowOwn}
       />
       <GrowSection />
       <CompeteSection
