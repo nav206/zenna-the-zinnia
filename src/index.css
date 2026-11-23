@@ -1156,6 +1156,37 @@ code {
   font-size: 0.9rem;
 }
 
+.auth-form__info {
+  margin: 0.85rem 0 0;
+  color: var(--leaf);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.auth-panel__mode-title {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.auth-panel__links {
+  margin: 0.75rem 0 0;
+}
+
+.ext-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.28rem;
+}
+
+.ext-link__arrow {
+  font-size: 0.85em;
+  line-height: 1;
+  transform: translateY(-0.05em);
+  opacity: 0.9;
+}
+
 .auth-panel {
   margin-top: 1.15rem;
   max-width: 24rem;

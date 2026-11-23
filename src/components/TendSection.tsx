@@ -72,6 +72,18 @@ type TendSectionProps = {
   onClearAuthError: () => void
   plantName?: string | null
   unlockedAchievements: AchievementId[]
+  onPlantSpeak?: () => void
+  onForgotPassword?: (email: string) => Promise<{
+    ok: boolean
+    message: string
+    resetPath?: string
+  }>
+  onResetPassword?: (input: {
+    token: string
+    password: string
+  }) => Promise<boolean>
+  resetToken?: string | null
+  onClearResetToken?: () => void
 }
 
 export function TendSection({
@@ -95,6 +107,11 @@ export function TendSection({
   onClearAuthError,
   plantName = null,
   unlockedAchievements,
+  onPlantSpeak,
+  onForgotPassword,
+  onResetPassword,
+  resetToken = null,
+  onClearResetToken,
 }: TendSectionProps) {
   const reduceMotion = useReducedMotion()
   const needsAuth = scope === 'personal' && !user
@@ -155,6 +172,10 @@ export function TendSection({
               onLogout={onLogout}
               onClearError={onClearAuthError}
               plantName={plantName}
+              onForgotPassword={onForgotPassword}
+              onResetPassword={onResetPassword}
+              resetToken={resetToken}
+              onClearResetToken={onClearResetToken}
             />
           )}
 
@@ -261,6 +282,7 @@ export function TendSection({
           onEffectComplete={onEffectComplete}
           compact
           talkative={!needsAuth}
+          onSpeak={onPlantSpeak}
         />
       </div>
 

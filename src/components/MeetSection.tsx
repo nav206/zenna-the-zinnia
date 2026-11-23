@@ -81,7 +81,7 @@ export function MeetSection({
         >
           An adopted plant that teaches me what it is like to show up every day,
           patiently trust the process, find beauty in steady growth, and bloom
-          even on gloomy days. Flip her portrait for a pocket field guide.
+          even on gloomy days.
         </motion.p>
         <motion.div
           className="cta-row"
@@ -110,8 +110,16 @@ export function MeetSection({
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.36 }}
         >
-          <a href={PORTFOLIO_URL} target="_blank" rel="noreferrer">
+          <a
+            className="ext-link"
+            href={PORTFOLIO_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn more about the project
+            <span className="ext-link__arrow" aria-hidden="true">
+              ↗
+            </span>
           </a>
         </motion.p>
       </div>

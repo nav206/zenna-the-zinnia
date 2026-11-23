@@ -6,6 +6,7 @@ import {
 } from '../data/achievements'
 import { syncAchievements } from '../lib/api'
 import {
+  allEggsFound,
   bumpLifetimeCare,
   markEgg,
   mergeUnlocked,
@@ -66,7 +67,7 @@ export function useAchievements(opts: {
     (egg: EggId) => {
       const nextEggs = markEgg(egg)
       setEggs(nextEggs)
-      if (nextEggs.includes('flip_portrait') && nextEggs.includes('roots')) {
+      if (allEggsFound(nextEggs)) {
         unlock(['bounty_hunter'])
       }
     },

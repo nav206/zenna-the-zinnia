@@ -12,6 +12,8 @@ type PlantStageProps = {
   compact?: boolean
   /** Click the plant for a random speech bubble. */
   talkative?: boolean
+  /** Fired once the plant speaks (secret find). */
+  onSpeak?: () => void
 }
 
 function WaterOverlay({ reduce }: { reduce: boolean | null }) {
@@ -185,6 +187,7 @@ export function PlantStage({
   onEffectComplete,
   compact = false,
   talkative = false,
+  onSpeak,
 }: PlantStageProps) {
   const reduceMotion = useReducedMotion()
   const label = mood ? moodLabel(mood) : null
@@ -214,6 +217,7 @@ export function PlantStage({
       PLANT_QUOTES[Math.floor(Math.random() * PLANT_QUOTES.length)] ??
       PLANT_QUOTES[0]
     setQuote(next)
+    onSpeak?.()
     if (quoteTimer.current) window.clearTimeout(quoteTimer.current)
     quoteTimer.current = window.setTimeout(() => setQuote(null), 3200)
   }

@@ -8,7 +8,9 @@ const UNLOCKED_KEY = 'zenna-achievements-v1'
 const EGGS_KEY = 'zenna-eggs-v1'
 const LIFETIME_CARE_KEY = 'zenna-lifetime-care-v1'
 
-export type EggId = 'flip_portrait' | 'roots'
+export type EggId = 'flip_portrait' | 'plant_quotes' | 'roots'
+
+const EGG_IDS: EggId[] = ['flip_portrait', 'plant_quotes', 'roots']
 
 function readJson<T>(key: string, fallback: T): T {
   try {
@@ -46,13 +48,17 @@ export function mergeUnlocked(ids: AchievementId[]): AchievementId[] {
 
 export function readEggs(): EggId[] {
   const raw = readJson<string[]>(EGGS_KEY, [])
-  return raw.filter((e): e is EggId => e === 'flip_portrait' || e === 'roots')
+  return raw.filter((e): e is EggId => (EGG_IDS as string[]).includes(e))
 }
 
 export function markEgg(egg: EggId): EggId[] {
   const next = [...new Set([...readEggs(), egg])]
   writeJson(EGGS_KEY, next)
   return next
+}
+
+export function allEggsFound(eggs: EggId[]) {
+  return EGG_IDS.every((id) => eggs.includes(id))
 }
 
 export function readLifetimeCare(): number {

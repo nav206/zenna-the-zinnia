@@ -137,8 +137,16 @@ export function FooterRoots({
             <ul className="footer-sources__list" role="list">
               {SOURCES.map((source) => (
                 <li key={source.href}>
-                  <a href={source.href} target="_blank" rel="noreferrer">
+                  <a
+                    className="ext-link"
+                    href={source.href}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     {source.label}
+                    <span className="ext-link__arrow" aria-hidden="true">
+                      ↗
+                    </span>
                   </a>
                 </li>
               ))}
@@ -153,12 +161,16 @@ export function FooterRoots({
           </p>
           <p className="footer-support">
             <a
+              className="ext-link"
               href={BMC_URL}
               target="_blank"
               rel="noreferrer"
               onClick={() => onSupportClick?.()}
             >
               Buy me a <s>coffee</s> hot chocolate
+              <span className="ext-link__arrow" aria-hidden="true">
+                ↗
+              </span>
             </a>
           </p>
         </div>

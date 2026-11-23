@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   fetchMe,
+  forgotPassword as apiForgotPassword,
   login as apiLogin,
   logout as apiLogout,
+  resetPassword as apiResetPassword,
   signup as apiSignup,
   type ApiPlant,
   type ApiUser,
@@ -74,6 +76,36 @@ export function useAuth() {
     setAchievements(null)
   }, [])
 
+  const forgotPassword = useCallback(async (email: string) => {
+    setError(null)
+    const res = await apiForgotPassword(email)
+    if (res.error || !res.data) {
+      setError(res.error || 'Could not start password reset.')
+      return { ok: false as const, message: res.error || 'Could not start password reset.' }
+    }
+    return {
+      ok: true as const,
+      message: res.data.message,
+      resetPath: res.data.resetPath,
+    }
+  }, [])
+
+  const resetPassword = useCallback(
+    async (input: { token: string; password: string }) => {
+      setError(null)
+      const res = await apiResetPassword(input)
+      if (res.error || !res.data) {
+        setError(res.error || 'Could not reset password.')
+        return false
+      }
+      setUser(res.data.user)
+      setPersonalPlant(res.data.plant)
+      setAchievements(res.data.achievements ?? [])
+      return true
+    },
+    [],
+  )
+
   return {
     user,
     personalPlant,
@@ -85,6 +117,8 @@ export function useAuth() {
     signup,
     login,
     logout,
+    forgotPassword,
+    resetPassword,
     refresh,
   }
 }

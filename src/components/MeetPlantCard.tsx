@@ -55,7 +55,6 @@ export function MeetPlantCard({
     if (next && !flipEggFired) {
       setFlipEggFired(true)
       onPortraitFlipEgg?.()
-      onEgg?.('Portrait flipped — a quiet find for curious gardeners.')
     }
   }
 

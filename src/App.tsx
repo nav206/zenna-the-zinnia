@@ -21,6 +21,25 @@ import { fetchCompeteStats, type ApiPlant } from './lib/api'
 const SESSION_CARE_KEY = 'zenna-session-care-v1'
 const MATURE_AT = 12
 
+function readResetToken() {
+  try {
+    return new URLSearchParams(window.location.search).get('reset')
+  } catch {
+    return null
+  }
+}
+
+function clearResetTokenFromUrl() {
+  try {
+    const url = new URL(window.location.href)
+    if (!url.searchParams.has('reset')) return
+    url.searchParams.delete('reset')
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`)
+  } catch {
+    // ignore
+  }
+}
+
 function readSessionCare() {
   try {
     const raw = sessionStorage.getItem(SESSION_CARE_KEY)
@@ -45,6 +64,9 @@ export default function App() {
   const [globalSnapshot, setGlobalSnapshot] = useState<ApiPlant | null>(null)
   const [sessionCare, setSessionCare] = useState(() => readSessionCare())
   const [eggMessage, setEggMessage] = useState<string | null>(null)
+  const [resetToken, setResetToken] = useState<string | null>(() =>
+    readResetToken(),
+  )
   const eggTimer = useRef<number | null>(null)
   const auth = useAuth()
 
@@ -77,6 +99,15 @@ export default function App() {
   useEffect(() => {
     void refreshCompete()
   }, [refreshCompete, auth.user?.id])
+
+  useEffect(() => {
+    if (!resetToken) return
+    setScope('personal')
+    // Wait a tick so Tend mounts before scrolling.
+    window.setTimeout(() => {
+      document.getElementById('tend')?.scrollIntoView({ behavior: 'smooth' })
+    }, 80)
+  }, [resetToken])
 
   useEffect(() => {
     return observeSectionViews([
@@ -200,6 +231,24 @@ export default function App() {
         yourCareMoments={yourCareMoments}
         plantName={auth.personalPlant?.plantName}
         unlockedAchievements={achievements.unlocked}
+        onPlantSpeak={() => achievements.noteEgg('plant_quotes')}
+        resetToken={resetToken}
+        onClearResetToken={() => {
+          setResetToken(null)
+          clearResetTokenFromUrl()
+        }}
+        onForgotPassword={auth.forgotPassword}
+        onResetPassword={async (input) => {
+          const ok = await auth.resetPassword(input)
+          if (ok) {
+            setScope('personal')
+            setResetToken(null)
+            clearResetTokenFromUrl()
+            await plant.reload()
+            await refreshCompete()
+          }
+          return ok
+        }}
         onTend={async (action) => {
           const priorPersonalCare =
             scope === 'personal' && auth.user

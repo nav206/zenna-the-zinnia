@@ -118,6 +118,28 @@ export function logout() {
   return request<{ ok: boolean }>('/api/auth/logout', { method: 'POST' })
 }
 
+export function forgotPassword(email: string) {
+  return request<{ ok: boolean; message: string; resetPath?: string }>(
+    '/api/auth/forgot-password',
+    {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    },
+  )
+}
+
+export function resetPassword(input: { token: string; password: string }) {
+  return request<{
+    ok: boolean
+    user: ApiUser
+    plant: ApiPlant
+    achievements?: string[]
+  }>('/api/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  })
+}
+
 export function fetchGlobalPlant() {
   return request<{ plant: ApiPlant }>('/api/plants/global')
 }

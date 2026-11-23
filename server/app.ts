@@ -17,6 +17,12 @@ import {
   unlockAchievements,
 } from './lib/achievements'
 import {
+  allowDevResetLinks,
+  createPasswordReset,
+  consumePasswordReset,
+  sendPasswordResetEmail,
+} from './lib/passwordReset'
+import {
   applyPlantCare,
   CareLockedError,
   careTotals,
@@ -47,6 +53,15 @@ const careSchema = z.object({
 
 const achievementsSchema = z.object({
   ids: z.array(z.string().min(1).max(64)).max(32),
+})
+
+const forgotSchema = z.object({
+  email: z.string().email().max(200),
+})
+
+const resetSchema = z.object({
+  token: z.string().min(20).max(200),
+  password: z.string().min(8).max(200),
 })
 
 const routes = new Hono()
@@ -160,6 +175,92 @@ routes.post('/auth/login', async (c) => {
 routes.post('/auth/logout', async (c) => {
   clearSessionCookie(c)
   return c.json({ ok: true })
+})
+
+routes.post('/auth/forgot-password', async (c) => {
+  if (!authConfigured()) {
+    return c.json(
+      { error: 'Auth is not configured. Set SESSION_SECRET (16+ chars).' },
+      503,
+    )
+  }
+  const body = forgotSchema.safeParse(await c.req.json().catch(() => null))
+  if (!body.success) return c.json({ error: 'Enter a valid email.' }, 400)
+
+  const limit = await takeRateLimit(`forgot:${clientKey(c)}`, 8)
+  if (!limit.ok) {
+    return c.json({ error: 'Too many reset requests from this network.' }, 429)
+  }
+
+  const email = body.data.email.toLowerCase()
+  const generic = {
+    ok: true as const,
+    message:
+      'If that email is registered, a reset link is on its way. Check your inbox.',
+  }
+
+  const rows = await sql<{ id: string; email: string }>(
+    `select id, email from users where email = $1`,
+    [email],
+  )
+  const user = rows[0]
+  if (!user) return c.json(generic)
+
+  const { token } = await createPasswordReset(user.id)
+  const origin = new URL(c.req.url).origin
+  const resetPath = `/?reset=${encodeURIComponent(token)}#tend`
+  const resetUrl = `${origin}${resetPath}`
+  const emailed = await sendPasswordResetEmail({ to: user.email, resetUrl })
+
+  if (allowDevResetLinks() && !emailed) {
+    return c.json({ ...generic, resetPath })
+  }
+  return c.json(generic)
+})
+
+routes.post('/auth/reset-password', async (c) => {
+  if (!authConfigured()) {
+    return c.json(
+      { error: 'Auth is not configured. Set SESSION_SECRET (16+ chars).' },
+      503,
+    )
+  }
+  const body = resetSchema.safeParse(await c.req.json().catch(() => null))
+  if (!body.success) {
+    return c.json({ error: 'Invalid reset details.' }, 400)
+  }
+
+  const limit = await takeRateLimit(`reset:${clientKey(c)}`, 12)
+  if (!limit.ok) return c.json({ error: 'Too many reset attempts.' }, 429)
+
+  const consumed = await consumePasswordReset(body.data.token)
+  if (!consumed) {
+    return c.json(
+      { error: 'This reset link is invalid or has expired. Request a new one.' },
+      400,
+    )
+  }
+
+  const passwordHash = await hashPassword(body.data.password)
+  const rows = await sql<{ id: string; email: string; display_name: string }>(
+    `update users set password_hash = $2
+     where id = $1
+     returning id, email, display_name`,
+    [consumed.userId, passwordHash],
+  )
+  const row = rows[0]
+  if (!row) return c.json({ error: 'Could not update password.' }, 400)
+
+  const user = {
+    id: row.id,
+    email: row.email,
+    displayName: row.display_name,
+  }
+  const token = await createSessionToken(user)
+  setSessionCookie(c, token)
+  const plant = await getPersonalPlant(user.id)
+  const achievements = await listAchievements(user.id)
+  return c.json({ user, plant, achievements, ok: true })
 })
 
 routes.post('/achievements', async (c) => {

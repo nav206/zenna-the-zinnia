@@ -35,7 +35,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'bounty_hunter',
     title: 'Bounty Hunter',
-    description: 'Find both easter eggs: flip the portrait and the roots trick.',
+    description: 'Find all 3 hidden easter eggs.',
   },
   {
     id: 'hands_muddy',
