@@ -29,7 +29,7 @@ const ACTIONS: {
   {
     id: 'sunlight',
     label: 'Sunlight',
-    hint: 'Warm wash and a stretch toward the window.',
+    hint: 'Warm wash and a stretch toward the sunrays.',
     lockedHint: '',
   },
   {
