@@ -66,7 +66,7 @@ export function FooterRoots({
   function onRootsClick() {
     const next = rootClicks + 1
     setRootClicks(next)
-    if (next === 7) {
+    if (next === 5) {
       onEgg?.(
         'The soil remembers. Quiet finds count toward a real-plant giveaway.',
       )

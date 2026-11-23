@@ -20,17 +20,16 @@ export const plantProfile = {
   origin: 'Mexico → windowsills worldwide',
   adopted: '2026-09-26',
   needs: [
-    'Sip, don’t swamp',
-    '6–8 hrs sun (daily tan)',
-    'Elbow room or drama',
+    'Hydration',
+    '6–8 hrs of tanning (sunlight)',
+    'Space (don’t cramp with others)',
   ],
   strengths: [
-    'Rizz for humans + pollinators',
-    'Cut me → encore blooms',
-    'Eats soil drama for breakfast',
+    'Multispecies rizz (attracts humans & bees)',
+    'Deeper you cut me, more I bloom — grit',
   ],
   weaknesses: [
-    'No beach days (salt = nope)',
-    'Wet leaves → mildew arc',
+    'Gets sick if wet too long (powdery mildew)',
+    'Can’t take salinity (no beach days for Zenna)',
   ],
 } as const
