@@ -13,12 +13,17 @@ import {
 import { isCareAction } from './lib/careMath'
 import { sql, usingRemoteDb } from './lib/db'
 import {
+  listAchievements,
+  unlockAchievements,
+} from './lib/achievements'
+import {
   applyPlantCare,
   CareLockedError,
   careTotals,
   getGlobalPlant,
   getPersonalPlant,
   mirrorPersonalCareToGlobal,
+  setPersonalPlantName,
   signupCount,
 } from './lib/plants'
 import { clientKey, takeRateLimit } from './lib/rateLimit'
@@ -27,6 +32,7 @@ const signupSchema = z.object({
   email: z.string().email().max(200),
   password: z.string().min(8).max(200),
   displayName: z.string().trim().min(2).max(40),
+  plantName: z.string().trim().min(2).max(40),
 })
 
 const loginSchema = z.object({
@@ -37,6 +43,10 @@ const loginSchema = z.object({
 const careSchema = z.object({
   action: z.string(),
   scope: z.enum(['global', 'personal']),
+})
+
+const achievementsSchema = z.object({
+  ids: z.array(z.string().min(1).max(64)).max(32),
 })
 
 const routes = new Hono()
@@ -61,7 +71,8 @@ routes.get('/me', async (c) => {
   const user = await readSession(c)
   if (!user) return c.json({ user: null })
   const plant = await getPersonalPlant(user.id)
-  return c.json({ user, plant })
+  const achievements = await listAchievements(user.id)
+  return c.json({ user, plant, achievements })
 })
 
 routes.post('/auth/signup', async (c) => {
@@ -94,7 +105,7 @@ routes.post('/auth/signup', async (c) => {
     [id, email, passwordHash, body.data.displayName],
   )
   const created = rows[0]
-  await getPersonalPlant(created.id)
+  const plant = await setPersonalPlantName(created.id, body.data.plantName)
   const user = {
     id: created.id,
     email: created.email,
@@ -102,9 +113,9 @@ routes.post('/auth/signup', async (c) => {
   }
   const token = await createSessionToken(user)
   setSessionCookie(c, token)
-  const plant = await getPersonalPlant(user.id)
+  const achievements = await listAchievements(user.id)
   const roots = await signupCount()
-  return c.json({ user, plant, signupCount: roots }, 201)
+  return c.json({ user, plant, achievements, signupCount: roots }, 201)
 })
 
 routes.post('/auth/login', async (c) => {
@@ -142,12 +153,22 @@ routes.post('/auth/login', async (c) => {
   const token = await createSessionToken(user)
   setSessionCookie(c, token)
   const plant = await getPersonalPlant(user.id)
-  return c.json({ user, plant })
+  const achievements = await listAchievements(user.id)
+  return c.json({ user, plant, achievements })
 })
 
 routes.post('/auth/logout', async (c) => {
   clearSessionCookie(c)
   return c.json({ ok: true })
+})
+
+routes.post('/achievements', async (c) => {
+  const user = await readSession(c)
+  if (!user) return c.json({ error: 'Sign in to keep your achievements.' }, 401)
+  const body = achievementsSchema.safeParse(await c.req.json().catch(() => null))
+  if (!body.success) return c.json({ error: 'Invalid achievements payload.' }, 400)
+  const achievements = await unlockAchievements(user.id, body.data.ids)
+  return c.json({ achievements })
 })
 
 routes.get('/plants/global', async (c) => {

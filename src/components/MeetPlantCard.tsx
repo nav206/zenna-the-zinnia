@@ -10,6 +10,7 @@ type MeetPlantCardProps = {
   mood: PlantMood
   activeEffect: CareActionId | null
   onEgg?: (message: string) => void
+  onPortraitFlipEgg?: () => void
 }
 
 function FlipIcon({ className }: { className?: string }) {
@@ -38,10 +39,12 @@ export function MeetPlantCard({
   mood,
   activeEffect,
   onEgg,
+  onPortraitFlipEgg,
 }: MeetPlantCardProps) {
   const reduceMotion = useReducedMotion()
   const [flipped, setFlipped] = useState(false)
   const [moodClicks, setMoodClicks] = useState(0)
+  const [flipEggFired, setFlipEggFired] = useState(false)
   const titleId = useId()
   const label = moodLabel(mood)
 
@@ -49,6 +52,11 @@ export function MeetPlantCard({
     const next = !flipped
     setFlipped(next)
     trackPlantCardFlip(next)
+    if (next && !flipEggFired) {
+      setFlipEggFired(true)
+      onPortraitFlipEgg?.()
+      onEgg?.('Portrait flipped — a quiet find for curious gardeners.')
+    }
   }
 
   function onMoodClick(e: MouseEvent) {

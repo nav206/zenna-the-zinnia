@@ -12,9 +12,15 @@ type MeetSectionProps = {
   mood: PlantMood
   activeEffect: CareActionId | null
   onEgg?: (message: string) => void
+  onPortraitFlipEgg?: () => void
 }
 
-export function MeetSection({ mood, activeEffect, onEgg }: MeetSectionProps) {
+export function MeetSection({
+  mood,
+  activeEffect,
+  onEgg,
+  onPortraitFlipEgg,
+}: MeetSectionProps) {
   const reduceMotion = useReducedMotion()
   const [markClicks, setMarkClicks] = useState(0)
   const markTimer = useRef<number | null>(null)
@@ -113,6 +119,7 @@ export function MeetSection({ mood, activeEffect, onEgg }: MeetSectionProps) {
         mood={mood}
         activeEffect={activeEffect}
         onEgg={onEgg}
+        onPortraitFlipEgg={onPortraitFlipEgg}
       />
     </section>
   )

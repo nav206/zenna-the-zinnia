@@ -5,6 +5,7 @@ import { FooterRoots } from './components/FooterRoots'
 import { GrowSection } from './components/GrowSection'
 import { MeetSection } from './components/MeetSection'
 import { TendSection } from './components/TendSection'
+import { useAchievements } from './hooks/useAchievements'
 import { useAuth } from './hooks/useAuth'
 import { usePlantMood, type PlantScope } from './hooks/usePlantMood'
 import {
@@ -18,6 +19,7 @@ import {
 import { fetchCompeteStats, type ApiPlant } from './lib/api'
 
 const SESSION_CARE_KEY = 'zenna-session-care-v1'
+const MATURE_AT = 12
 
 function readSessionCare() {
   try {
@@ -59,6 +61,12 @@ export default function App() {
     eggTimer.current = window.setTimeout(() => setEggMessage(null), 4200)
   }, [])
 
+  const achievements = useAchievements({
+    authed: Boolean(auth.user),
+    serverIds: auth.achievements,
+    onToast: showEgg,
+  })
+
   const refreshCompete = useCallback(async () => {
     const res = await fetchCompeteStats()
     if (!res.data) return
@@ -78,6 +86,7 @@ export default function App() {
       'tend',
       'sources',
       'roots',
+      'achievements',
     ])
   }, [])
 
@@ -93,6 +102,7 @@ export default function App() {
       totalCare: plant.mood.totalCare,
       growthStage: 'mature',
       unlockedActions: plant.mood.unlockedActions,
+      plantName: null,
       updatedAt: new Date().toISOString(),
     })
   }, [
@@ -107,6 +117,15 @@ export default function App() {
     plant.mood.unlockedActions,
   ])
 
+  const unlockAchievement = achievements.unlock
+
+  // Already-mature personal plots still earn Green Thumb on load.
+  useEffect(() => {
+    if (auth.personalPlant?.growthStage === 'mature') {
+      unlockAchievement(['green_thumb'])
+    }
+  }, [auth.personalPlant?.growthStage, unlockAchievement])
+
   const handleScopeChange = (next: PlantScope) => {
     setScope(next)
     plant.setApiError(null)
@@ -117,6 +136,7 @@ export default function App() {
     email: string
     password: string
     displayName: string
+    plantName: string
   }) => {
     const ok = await auth.signup(input)
     if (ok) {
@@ -162,6 +182,7 @@ export default function App() {
         mood={plant.mood}
         activeEffect={plant.activeEffect}
         onEgg={showEgg}
+        onPortraitFlipEgg={() => achievements.noteEgg('flip_portrait')}
       />
       <GrowSection />
       <CompeteSection
@@ -177,7 +198,13 @@ export default function App() {
         daytime={plant.daytime}
         activeEffect={plant.activeEffect}
         yourCareMoments={yourCareMoments}
+        plantName={auth.personalPlant?.plantName}
+        unlockedAchievements={achievements.unlocked}
         onTend={async (action) => {
+          const priorPersonalCare =
+            scope === 'personal' && auth.user
+              ? (auth.personalPlant?.totalCare ?? plant.mood.totalCare)
+              : null
           const ok = await plant.tend(action)
           if (!ok) return
           // Guests: count this browser’s care toward “Your care”.
@@ -188,6 +215,19 @@ export default function App() {
               return next
             })
           }
+          const nextPersonalCare =
+            priorPersonalCare == null ? null : priorPersonalCare + 1
+          achievements.noteCare({
+            action,
+            daytime: plant.daytime,
+            personalStage:
+              nextPersonalCare != null && nextPersonalCare >= MATURE_AT
+                ? 'mature'
+                : scope === 'personal'
+                  ? plant.mood.growthStage
+                  : null,
+            personalTotalCare: nextPersonalCare,
+          })
           trackCareAction(action, scope)
           await refreshCompete()
         }}
@@ -216,6 +256,11 @@ export default function App() {
         refreshKey={rootsKey}
         onJoin={handleJoin}
         onEgg={showEgg}
+        onRootsEgg={() => achievements.noteEgg('roots')}
+        onSupportClick={() => {
+          trackCtaClick('buy_me_a_hot_chocolate', 'https://buymeacoffee.com/nav206')
+          achievements.noteDonation()
+        }}
       />
       <EggToast message={eggMessage} />
     </main>

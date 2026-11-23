@@ -11,6 +11,7 @@ import {
 export function useAuth() {
   const [user, setUser] = useState<ApiUser | null>(null)
   const [personalPlant, setPersonalPlant] = useState<ApiPlant | null>(null)
+  const [achievements, setAchievements] = useState<string[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -19,9 +20,11 @@ export function useAuth() {
     if (res.data?.user) {
       setUser(res.data.user)
       setPersonalPlant(res.data.plant ?? null)
+      setAchievements(res.data.achievements ?? [])
     } else {
       setUser(null)
       setPersonalPlant(null)
+      setAchievements(null)
     }
     setLoading(false)
   }, [])
@@ -35,6 +38,7 @@ export function useAuth() {
       email: string
       password: string
       displayName: string
+      plantName: string
     }) => {
       setError(null)
       const res = await apiSignup(input)
@@ -44,6 +48,7 @@ export function useAuth() {
       }
       setUser(res.data.user)
       setPersonalPlant(res.data.plant)
+      setAchievements(res.data.achievements ?? [])
       return true
     },
     [],
@@ -58,6 +63,7 @@ export function useAuth() {
     }
     setUser(res.data.user)
     setPersonalPlant(res.data.plant)
+    setAchievements(res.data.achievements ?? [])
     return true
   }, [])
 
@@ -65,12 +71,14 @@ export function useAuth() {
     await apiLogout()
     setUser(null)
     setPersonalPlant(null)
+    setAchievements(null)
   }, [])
 
   return {
     user,
     personalPlant,
     setPersonalPlant,
+    achievements,
     loading,
     error,
     setError,

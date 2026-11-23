@@ -2,6 +2,8 @@ import { motion, useReducedMotion } from 'motion/react'
 import type { ApiUser } from '../lib/api'
 import type { CareActionId, PlantMood, PlantScope } from '../hooks/usePlantMood'
 import { playSingChime } from '../lib/singAudio'
+import type { AchievementId } from '../data/achievements'
+import { AchievementGallery } from './AchievementGallery'
 import { AuthPanel } from './AuthPanel'
 import { PlantStage } from './PlantStage'
 
@@ -63,10 +65,13 @@ type TendSectionProps = {
     email: string
     password: string
     displayName: string
+    plantName: string
   }) => Promise<boolean>
   onLogin: (input: { email: string; password: string }) => Promise<boolean>
   onLogout: () => Promise<void>
   onClearAuthError: () => void
+  plantName?: string | null
+  unlockedAchievements: AchievementId[]
 }
 
 export function TendSection({
@@ -88,6 +93,8 @@ export function TendSection({
   onLogin,
   onLogout,
   onClearAuthError,
+  plantName = null,
+  unlockedAchievements,
 }: TendSectionProps) {
   const reduceMotion = useReducedMotion()
   const needsAuth = scope === 'personal' && !user
@@ -147,6 +154,7 @@ export function TendSection({
               onLogin={onLogin}
               onLogout={onLogout}
               onClearError={onClearAuthError}
+              plantName={plantName}
             />
           )}
 
@@ -154,7 +162,7 @@ export function TendSection({
             {scope === 'global'
               ? 'Shared plot — open to every visitor'
               : user
-                ? `Personal plot — ${user.displayName} · ${mood.growthStage}`
+                ? `Personal plot — ${plantName || user.displayName} · ${mood.growthStage}`
                 : 'Personal plot — sign in to begin'}
             {' · '}
             {daytime ? 'Local day' : 'Local night'}
@@ -254,6 +262,10 @@ export function TendSection({
           compact
           talkative={!needsAuth}
         />
+      </div>
+
+      <div className="chapter__inner">
+        <AchievementGallery unlocked={unlockedAchievements} />
       </div>
     </section>
   )

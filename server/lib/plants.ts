@@ -16,6 +16,7 @@ export type PlantView = MoodStats & {
   scope: 'global' | 'personal'
   growthStage: GrowthStage
   unlockedActions: CareAction[]
+  plantName: string | null
   updatedAt: string
 }
 
@@ -28,6 +29,7 @@ type MoodRow = {
   joy: number
   total_care: number
   growth_stage: string | null
+  plant_name: string | null
   updated_at: string | Date
 }
 
@@ -65,12 +67,13 @@ function mapRow(row: MoodRow): PlantView {
       : growthStage === 'growing'
         ? (['water', 'sunlight', 'sing', 'prune'] as CareAction[])
         : (['water', 'sunlight', 'sing'] as CareAction[]),
+    plantName: row.plant_name?.trim() || null,
     updatedAt: new Date(row.updated_at).toISOString(),
   }
 }
 
 const SELECT_MOOD = `select id, scope, hydration, neatness, light, joy, total_care,
-  coalesce(growth_stage, 'seedling') as growth_stage, updated_at
+  coalesce(growth_stage, 'seedling') as growth_stage, plant_name, updated_at
   from plant_moods`
 
 export async function getGlobalPlant(): Promise<PlantView> {
@@ -107,6 +110,18 @@ export async function getPersonalPlant(userId: string): Promise<PlantView> {
   )
   const again = await sql<MoodRow>(`${SELECT_MOOD} where id = $1`, [userId])
   return mapRow(again[0])
+}
+
+export async function setPersonalPlantName(
+  userId: string,
+  plantName: string,
+): Promise<PlantView> {
+  await getPersonalPlant(userId)
+  await sql(`update plant_moods set plant_name = $2 where id = $1 and scope = 'personal'`, [
+    userId,
+    plantName,
+  ])
+  return getPersonalPlant(userId)
 }
 
 export async function applyPlantCare(opts: {
@@ -164,8 +179,10 @@ export async function applyPlantCare(opts: {
       joy: next.joy,
       total_care: next.totalCare,
       growth_stage: growthStage,
+      plant_name: current.plantName,
       updated_at: new Date(),
     }).unlockedActions,
+    plantName: current.plantName,
     updatedAt: new Date().toISOString(),
   }
 }

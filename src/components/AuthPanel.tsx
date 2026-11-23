@@ -9,7 +9,9 @@ type AuthPanelProps = {
     email: string
     password: string
     displayName: string
+    plantName: string
   }) => Promise<boolean>
+  plantName?: string | null
   onLogin: (input: { email: string; password: string }) => Promise<boolean>
   onLogout: () => Promise<void>
   onClearError: () => void
@@ -23,9 +25,11 @@ export function AuthPanel({
   onLogin,
   onLogout,
   onClearError,
+  plantName: savedPlantName = null,
 }: AuthPanelProps) {
   const [mode, setMode] = useState<'login' | 'signup'>('signup')
   const [displayName, setDisplayName] = useState('')
+  const [plantName, setPlantName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [pending, setPending] = useState(false)
@@ -43,6 +47,12 @@ export function AuthPanel({
       <div className="auth-panel auth-panel--in">
         <p className="auth-panel__hello">
           Signed in as <strong>{user.displayName}</strong>
+          {savedPlantName ? (
+            <>
+              {' '}
+              · tending <strong>{savedPlantName}</strong>
+            </>
+          ) : null}
         </p>
         <button
           type="button"
@@ -61,7 +71,7 @@ export function AuthPanel({
     setPending(true)
     const ok =
       mode === 'signup'
-        ? await onSignup({ email, password, displayName })
+        ? await onSignup({ email, password, displayName, plantName })
         : await onLogin({ email, password })
     setPending(false)
     if (ok) {
@@ -100,18 +110,33 @@ export function AuthPanel({
 
       <form className="auth-form" onSubmit={(e) => void submit(e)}>
         {mode === 'signup' && (
-          <label className="auth-form__field">
-            <span>Display name</span>
-            <input
-              name="displayName"
-              autoComplete="nickname"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              required
-              minLength={2}
-              maxLength={40}
-            />
-          </label>
+          <>
+            <label className="auth-form__field">
+              <span>Your name</span>
+              <input
+                name="displayName"
+                autoComplete="nickname"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                required
+                minLength={2}
+                maxLength={40}
+              />
+            </label>
+            <label className="auth-form__field">
+              <span>Plant name</span>
+              <input
+                name="plantName"
+                autoComplete="off"
+                placeholder="e.g. Zenna, Pepita, Sunny"
+                value={plantName}
+                onChange={(e) => setPlantName(e.target.value)}
+                required
+                minLength={2}
+                maxLength={40}
+              />
+            </label>
+          </>
         )}
         <label className="auth-form__field">
           <span>Email</span>

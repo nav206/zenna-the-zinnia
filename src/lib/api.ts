@@ -19,6 +19,7 @@ export type ApiPlant = {
   totalCare: number
   growthStage: GrowthStage
   unlockedActions: CareActionId[]
+  plantName: string | null
   updatedAt: string
 }
 
@@ -71,17 +72,23 @@ async function request<T>(
 }
 
 export function fetchMe() {
-  return request<{ user: ApiUser | null; plant?: ApiPlant }>('/api/me')
+  return request<{
+    user: ApiUser | null
+    plant?: ApiPlant
+    achievements?: string[]
+  }>('/api/me')
 }
 
 export function signup(input: {
   email: string
   password: string
   displayName: string
+  plantName: string
 }) {
   return request<{
     user: ApiUser
     plant: ApiPlant
+    achievements?: string[]
     signupCount: number
   }>('/api/auth/signup', {
     method: 'POST',
@@ -90,9 +97,20 @@ export function signup(input: {
 }
 
 export function login(input: { email: string; password: string }) {
-  return request<{ user: ApiUser; plant: ApiPlant }>('/api/auth/login', {
+  return request<{
+    user: ApiUser
+    plant: ApiPlant
+    achievements?: string[]
+  }>('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify(input),
+  })
+}
+
+export function syncAchievements(ids: string[]) {
+  return request<{ achievements: string[] }>('/api/achievements', {
+    method: 'POST',
+    body: JSON.stringify({ ids }),
   })
 }
 
