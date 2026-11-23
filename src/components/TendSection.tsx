@@ -136,9 +136,8 @@ export function TendSection({
           <p className="eyebrow">Tend</p>
           <h2 id="tend-title">Now that you know her</h2>
           <p className="section-lede">
-            Care for the shared plot freely, or sign in for a seedling of your
-            own. Water, sunlight, and song first; prune and deadhead unlock as
-            she grows.
+            Care for a virtual Zinnia down below, or grow your own plant from
+            seedling (requires sign in).
           </p>
 
           <div className="tend-modes" role="tablist" aria-label="Which Zenna to tend">
