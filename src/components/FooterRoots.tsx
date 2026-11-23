@@ -27,12 +27,18 @@ type FooterRootsProps = {
   refreshKey?: number
   onJoin?: () => void
   onEgg?: (message: string) => void
+  onRootsEgg?: () => void
+  onSupportClick?: () => void
 }
+
+const BMC_URL = 'https://buymeacoffee.com/nav206'
 
 export function FooterRoots({
   refreshKey = 0,
   onJoin,
   onEgg,
+  onRootsEgg,
+  onSupportClick,
 }: FooterRootsProps) {
   const reduceMotion = useReducedMotion()
   const [signupCount, setSignupCount] = useState(0)
@@ -67,6 +73,7 @@ export function FooterRoots({
     const next = rootClicks + 1
     setRootClicks(next)
     if (next === 5) {
+      onRootsEgg?.()
       onEgg?.(
         'The soil remembers. Quiet finds count toward a real-plant giveaway.',
       )
@@ -130,8 +137,16 @@ export function FooterRoots({
             <ul className="footer-sources__list" role="list">
               {SOURCES.map((source) => (
                 <li key={source.href}>
-                  <a href={source.href} target="_blank" rel="noreferrer">
+                  <a
+                    className="ext-link"
+                    href={source.href}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     {source.label}
+                    <span className="ext-link__arrow" aria-hidden="true">
+                      ↗
+                    </span>
                   </a>
                 </li>
               ))}
@@ -139,10 +154,26 @@ export function FooterRoots({
           </div>
         </div>
 
-        <p className="footer-sources__note">
-          <span>If this reminded you of someone —</span>
-          <span>buy them flowers, or send them this page.</span>
-        </p>
+        <div className="site-footer__right">
+          <p className="footer-sources__note">
+            <span>If this reminded you of someone —</span>
+            <span>you should send them some flowers, or this page.</span>
+          </p>
+          <p className="footer-support">
+            <a
+              className="ext-link"
+              href={BMC_URL}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => onSupportClick?.()}
+            >
+              Buy me a <s>coffee</s> hot chocolate
+              <span className="ext-link__arrow" aria-hidden="true">
+                ↗
+              </span>
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   )

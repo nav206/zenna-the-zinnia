@@ -12,9 +12,17 @@ type MeetSectionProps = {
   mood: PlantMood
   activeEffect: CareActionId | null
   onEgg?: (message: string) => void
+  onPortraitFlipEgg?: () => void
+  onGrowOwn?: () => void
 }
 
-export function MeetSection({ mood, activeEffect, onEgg }: MeetSectionProps) {
+export function MeetSection({
+  mood,
+  activeEffect,
+  onEgg,
+  onPortraitFlipEgg,
+  onGrowOwn,
+}: MeetSectionProps) {
   const reduceMotion = useReducedMotion()
   const [markClicks, setMarkClicks] = useState(0)
   const markTimer = useRef<number | null>(null)
@@ -75,7 +83,7 @@ export function MeetSection({ mood, activeEffect, onEgg }: MeetSectionProps) {
         >
           An adopted plant that teaches me what it is like to show up every day,
           patiently trust the process, find beauty in steady growth, and bloom
-          even on gloomy days. Flip her portrait for a pocket field guide.
+          even on gloomy days.
         </motion.p>
         <motion.div
           className="cta-row"
@@ -93,7 +101,11 @@ export function MeetSection({ mood, activeEffect, onEgg }: MeetSectionProps) {
           <a
             className="cta cta--ghost"
             href="#tend"
-            onClick={() => trackCtaClick('grow_my_own_zinnia', '#tend')}
+            onClick={(e) => {
+              e.preventDefault()
+              trackCtaClick('grow_my_own_zinnia', '#tend')
+              onGrowOwn?.()
+            }}
           >
             Grow my own Zinnia
           </a>
@@ -104,8 +116,16 @@ export function MeetSection({ mood, activeEffect, onEgg }: MeetSectionProps) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.36 }}
         >
-          <a href={PORTFOLIO_URL} target="_blank" rel="noreferrer">
+          <a
+            className="ext-link"
+            href={PORTFOLIO_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn more about the project
+            <span className="ext-link__arrow" aria-hidden="true">
+              ↗
+            </span>
           </a>
         </motion.p>
       </div>
@@ -113,6 +133,7 @@ export function MeetSection({ mood, activeEffect, onEgg }: MeetSectionProps) {
         mood={mood}
         activeEffect={activeEffect}
         onEgg={onEgg}
+        onPortraitFlipEgg={onPortraitFlipEgg}
       />
     </section>
   )

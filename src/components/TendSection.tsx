@@ -1,7 +1,10 @@
 import { motion, useReducedMotion } from 'motion/react'
+import { useState } from 'react'
 import type { ApiUser } from '../lib/api'
 import type { CareActionId, PlantMood, PlantScope } from '../hooks/usePlantMood'
 import { playSingChime } from '../lib/singAudio'
+import type { AchievementId } from '../data/achievements'
+import { AchievementGallery } from './AchievementGallery'
 import { AuthPanel } from './AuthPanel'
 import { PlantStage } from './PlantStage'
 
@@ -26,7 +29,7 @@ const ACTIONS: {
   {
     id: 'sunlight',
     label: 'Sunlight',
-    hint: 'Warm wash and a stretch toward the window.',
+    hint: 'Warm wash and a stretch toward the sunrays.',
     lockedHint: '',
   },
   {
@@ -63,10 +66,25 @@ type TendSectionProps = {
     email: string
     password: string
     displayName: string
+    plantName: string
   }) => Promise<boolean>
   onLogin: (input: { email: string; password: string }) => Promise<boolean>
   onLogout: () => Promise<void>
   onClearAuthError: () => void
+  plantName?: string | null
+  unlockedAchievements: AchievementId[]
+  onPlantSpeak?: () => void
+  onForgotPassword?: (email: string) => Promise<{
+    ok: boolean
+    message: string
+    resetPath?: string
+  }>
+  onResetPassword?: (input: {
+    token: string
+    password: string
+  }) => Promise<boolean>
+  resetToken?: string | null
+  onClearResetToken?: () => void
 }
 
 export function TendSection({
@@ -88,12 +106,27 @@ export function TendSection({
   onLogin,
   onLogout,
   onClearAuthError,
+  plantName = null,
+  unlockedAchievements,
+  onPlantSpeak,
+  onForgotPassword,
+  onResetPassword,
+  resetToken = null,
+  onClearResetToken,
 }: TendSectionProps) {
   const reduceMotion = useReducedMotion()
   const needsAuth = scope === 'personal' && !user
+  const [authCareHint, setAuthCareHint] = useState<string | null>(null)
 
   async function handleAction(id: CareActionId) {
-    if (activeEffect || busy || needsAuth) return
+    if (activeEffect || busy) return
+    if (needsAuth) {
+      setAuthCareHint(
+        'Sign in to complete this care action, or switch to Care for Global to interact without an account.',
+      )
+      return
+    }
+    setAuthCareHint(null)
     if (scope === 'personal' && !mood.unlockedActions.includes(id)) return
     if (id === 'sing' && mood.soundEnabled) {
       try {
@@ -112,9 +145,8 @@ export function TendSection({
           <p className="eyebrow">Tend</p>
           <h2 id="tend-title">Now that you know her</h2>
           <p className="section-lede">
-            Care for the shared plot freely, or sign in for a seedling of your
-            own. Water, sunlight, and song first; prune and deadhead unlock as
-            she grows.
+            Care for a virtual Zinnia down below, or grow your own plant from
+            seedling (requires sign in).
           </p>
 
           <div className="tend-modes" role="tablist" aria-label="Which Zenna to tend">
@@ -123,7 +155,10 @@ export function TendSection({
               role="tab"
               aria-selected={scope === 'global'}
               className={scope === 'global' ? 'is-active' : ''}
-              onClick={() => onScopeChange('global')}
+              onClick={() => {
+                setAuthCareHint(null)
+                onScopeChange('global')
+              }}
             >
               Care for Global
             </button>
@@ -132,7 +167,10 @@ export function TendSection({
               role="tab"
               aria-selected={scope === 'personal'}
               className={scope === 'personal' ? 'is-active' : ''}
-              onClick={() => onScopeChange('personal')}
+              onClick={() => {
+                setAuthCareHint(null)
+                onScopeChange('personal')
+              }}
             >
               Care for Mine
             </button>
@@ -147,6 +185,11 @@ export function TendSection({
               onLogin={onLogin}
               onLogout={onLogout}
               onClearError={onClearAuthError}
+              plantName={plantName}
+              onForgotPassword={onForgotPassword}
+              onResetPassword={onResetPassword}
+              resetToken={resetToken}
+              onClearResetToken={onClearResetToken}
             />
           )}
 
@@ -154,10 +197,8 @@ export function TendSection({
             {scope === 'global'
               ? 'Shared plot — open to every visitor'
               : user
-                ? `Personal plot — ${user.displayName} · ${mood.growthStage}`
+                ? `Personal plot — ${plantName || user.displayName} · ${mood.growthStage}`
                 : 'Personal plot — sign in to begin'}
-            {' · '}
-            {daytime ? 'Local day' : 'Local night'}
           </p>
 
           {!needsAuth && (
@@ -193,6 +234,11 @@ export function TendSection({
               {apiError}
             </p>
           )}
+          {authCareHint && (
+            <p className="tend-error tend-error--hint" role="status">
+              {authCareHint}
+            </p>
+          )}
 
           <label className="sound-toggle">
             <input
@@ -210,8 +256,7 @@ export function TendSection({
                 scope === 'personal' &&
                 !needsAuth &&
                 !mood.unlockedActions.includes(action.id)
-              const disabled =
-                Boolean(activeEffect) || busy || needsAuth || locked
+              const disabled = Boolean(activeEffect) || busy || locked
 
               return (
                 <li key={action.id}>
@@ -219,7 +264,9 @@ export function TendSection({
                     type="button"
                     className={`care-action care-action--live${
                       activeEffect === action.id ? ' is-active' : ''
-                    }${locked ? ' is-locked' : ''}`}
+                    }${locked ? ' is-locked' : ''}${
+                      needsAuth ? ' care-action--needs-auth' : ''
+                    }`}
                     disabled={disabled}
                     onClick={() => void handleAction(action.id)}
                     initial={reduceMotion ? false : { opacity: 0, y: 10 }}
@@ -236,6 +283,11 @@ export function TendSection({
                     <span className="care-action__label">
                       {action.label}
                       {locked ? ' · locked' : ''}
+                      {action.id === 'sunlight' && !locked ? (
+                        <span className="care-action__sky">
+                          ({daytime ? 'Daytime detected' : 'Nighttime detected'})
+                        </span>
+                      ) : null}
                     </span>
                     <span className="care-action__hint">
                       {locked ? action.lockedHint : action.hint}
@@ -253,7 +305,12 @@ export function TendSection({
           onEffectComplete={onEffectComplete}
           compact
           talkative={!needsAuth}
+          onSpeak={onPlantSpeak}
         />
+      </div>
+
+      <div className="chapter__inner">
+        <AchievementGallery unlocked={unlockedAchievements} />
       </div>
     </section>
   )

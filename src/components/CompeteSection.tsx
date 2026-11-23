@@ -49,12 +49,14 @@ export function CompeteSection({
     },
     {
       id: 'you',
-      label: user ? `${user.displayName}'s Zenna` : 'Your Zenna',
+      label: user
+        ? personalPlant?.plantName || `${user.displayName}'s Zenna`
+        : 'Your Zenna',
       detail: user
         ? personalPlant
           ? `${personalPlant.totalCare} care moments on your plot`
           : 'Your personal plant awaits'
-        : 'Create an account to plant your own',
+        : 'Create an account to name and plant your own',
       score: personalPlant?.totalCare ?? 0,
       accent: 'sun' as const,
     },
