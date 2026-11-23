@@ -1,25 +1,31 @@
 # Zenna, the Zinnia
 
-A pet project. An interactive web experience serving dual purpose: tracking the growth of Zenna (my adopted zinnia plant) and on the same-page a mini-game to care for your own virtual plant. 
+I adopted a real zinnia and named her Zenna. Taking care of her taught me something simple and stubborn: growth is mostly showing up — water, light, patience, and the quiet hope that something will bloom even on gloomy days.
 
-**The project is Live At:** [https://zenna-the-zinnia.vercel.app/](https://zenna-the-zinnia.vercel.app/)  
+This site is that feeling, turned into a single page.
 
-Here's how it works:
+**Live:** [https://zenna-the-zinnia.vercel.app/](https://zenna-the-zinnia.vercel.app/)
 
-### Step 1: You meet Zenna. 
-### Step 2: You see what Zenna has been up to.
+## The idea
 
-### Step 3: You get to take care of your own Zinnia plant (v2; v3 coming not very soon.)
+Two stories share one scroll:
 
-There are two ways you can interact with virtual plant. 
-- **Globally:** anyone can use every care action on the webpage (no login required).
-- **Personally:** You create an account using email+PW combination; new plots start as a **seedling** (water / sunlight / sing only). **Prune** unlocks at 6 care moments (**growing**); **deadhead** at 12 (**mature**).
-- Any personal care you provide to your dear plant also contributes to **Global** statistics (as if a shared garden counts every visitor's action on the site).
+1. **Her story** — a diary of the real plant: how she arrived, how she grew, what tending her looked like week by week.
+2. **Your story** — a little garden you can tend in the browser. Care for a shared Global Zinnia with everyone else, or sign in, name a seedling of your own, and watch it grow.
 
+I wanted something that felt warm and a little playful — not a dashboard, not a product pitch. Just a place where a plant could teach presence, and visitors could join in.
 
- P.S. There are at least 3 easter eggs I have hidden in the webpage; if you find them-- you enter a giveaway for an actual plant.
+## How to wander through it
 
-## Stack Used:
+1. **Meet Zenna** — say hello. Peek at her pocket field guide if you’re curious.
+2. **Watch her grow** — the real timeline: weeks, leaves, blooms, the slow becoming.
+3. **Pick your adventure** — compare her IRL plot with the global garden, or start your own.
+4. **Tend** — water, sunlight, song, prune, deadhead. Guests can care for the shared plot freely; a personal seedling needs an account (and unlocks more care as it matures). Achievements quietly track care streaks and secret finds.
+5. **Roots** — every gardener who signs up deepens the roots at the bottom of the page.
+
+Personal care still counts toward the shared garden. Quiet finds are hidden around the page — if you discover them, you’re in the running for a real plant giveaway.
+
+## Stack
 
 - Vite + React + TypeScript
 - Hono API on Vercel serverless (`/api/*`)
@@ -30,15 +36,13 @@ There are two ways you can interact with virtual plant.
 
 ## Page spine
 
-I decided to keep it as simple as possible, and make a single page artifact. I think it works well, do you agree?
+Kept as a single-page artifact on purpose:
 
-1. **Meet** — Frida-style “Zenna” wordmark; flip icon on the portrait for a field card
-2. **Grow** — stem timeline; leaf cards hold the diary; editable care totals
-3. **Compete** — soft compare of IRL / Global / Your Zenna; “Compete against me” CTA
-4. **Tend** — Water, Prune, Sunlight, Sing, Deadhead; Global or personal plot
-5. **Footer roots** — grow with account signup count
-
-Finally, Here's how I and Cursor made this project happen: 
+1. **Meet** — Frida-style “Zenna” wordmark; portrait flips to a pocket field guide
+2. **Grow** — stem timeline; leaf cards hold the diary
+3. **Compete** — soft compare of IRL / Global / Your Zenna
+4. **Tend** — care actions; Global or personal plot; name your plant on signup; achievement gallery; forgot/reset password
+5. **Footer roots** — grow with account signup count; tip jar + learn-more links
 
 ## Develop
 
@@ -60,7 +64,7 @@ npm run preview
 
 ## Environment (Vercel) — database + secrets
 
-**You do not have a production database yet.** Local/dev uses in-memory PGlite when `DATABASE_URL` is unset. Accounts, Global/Personal moods, and signup roots only survive deploys once Postgres is attached.
+**You do not have a production database yet.** Local/dev uses in-memory PGlite when `DATABASE_URL` is unset. Accounts, Global/Personal moods, achievements, and signup roots only survive deploys once Postgres is attached.
 
 ### 1. Create Postgres on Vercel
 
@@ -81,6 +85,9 @@ npm run preview
 | `DATABASE_URL_UNPOOLED` | Optional direct URL for migrations behind a pooler |
 | `SESSION_SECRET` | Cookie signing (≥16 chars). Required for auth in production |
 | `VITE_GA_MEASUREMENT_ID` | Optional Google Analytics 4 ID (`G-…`). Leave blank to disable |
+| `RESEND_API_KEY` | Optional. Sends password-reset emails via Resend |
+| `RESET_EMAIL_FROM` | Optional From address for reset emails |
+| `ALLOW_DEV_RESET_LINKS` | Optional. When `1`, forgot-password may return a local `resetPath` for testing |
 
 Copy `.env.example` for local reference only — never commit real secrets.
 
@@ -113,7 +120,7 @@ Locally you can put the same key in `.env` (see `.env.example`). With no ID set,
 | --- | --- |
 | `page_view` | First load (gtag `config`) |
 | `section_view` | Meet / Grow / Compete / Tend / Roots first enter viewport |
-| `cta_click` | Hero, grow handoff, and compete CTAs |
+| `cta_click` | Hero, grow handoff, compete, and tip-jar CTAs |
 | `care_action` | Water / prune / sunlight / sing / deadhead |
 | `scope_change` | Global ↔ personal plot toggle |
 | `auth_signup` / `auth_login` / `auth_logout` | Auth success |
@@ -125,13 +132,13 @@ Locally you can put the same key in `.env` (see `.env.example`). With no ID set,
 
 ```text
 api/              Vercel serverless entry (Hono)
-server/           API app + db / auth / plants
+server/           API app + db / auth / plants / achievements / password reset
 migrations/       SQL schema (additive)
 src/
-  components/     Meet, Grow, Compete, Tend, FooterRoots, PlantStage
-  hooks/          usePlantMood, useAuth
-  lib/            api client, analytics, singAudio
-  data/growth.json
+  components/     Meet, Grow, Compete, Tend, FooterRoots, PlantStage, AchievementGallery
+  hooks/          usePlantMood, useAuth, useAchievements
+  lib/            api client, analytics, achievementsStore, singAudio
+  data/           growth.json, plantProfile, achievements catalog
 scripts/migrate.mjs
 ```
 
@@ -141,11 +148,11 @@ scripts/migrate.mjs
 | --- | --- |
 | Water | Droplets, soil darkens, mist, happy sway |
 | Prune | Snip flash + leaf fall |
-| Sunlight | Warm wash / rays / sun core, stretch |
+| Sunlight | Warm wash / rays / sun core, stretch toward sunrays |
 | Sing | Petal pulse + optional chime (muted by default) |
 | Deadhead | Bloom snip + petal scatter |
 
-Global and personal moods persist in Postgres (or PGlite locally). Sing mute preference stays in the browser.
+Global and personal moods persist in Postgres (or PGlite locally). Sing mute preference stays in the browser. Guest achievements live in `localStorage` and sync when you sign in.
 
 ## Deploy (Vercel)
 
@@ -155,7 +162,7 @@ Global and personal moods persist in Postgres (or PGlite locally). Sing mute pre
 - SPA rewrite skips `/api/*` (see `vercel.json`)
 - Attach a Postgres store and set `DATABASE_URL` + `SESSION_SECRET`
 
-# NOTE TO SELF: 
+# NOTE TO SELF:
 ## Portfolio
 
 Link or iframe this URL from the portfolio project card. Do not merge this app into the portfolio repo until both are stable.
