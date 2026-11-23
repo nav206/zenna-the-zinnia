@@ -157,7 +157,7 @@ export function FooterRoots({
         <div className="site-footer__right">
           <p className="footer-sources__note">
             <span>If this reminded you of someone —</span>
-            <span>buy them flowers, or send them this page.</span>
+            <span>you should send them some flowers, or this page.</span>
           </p>
           <p className="footer-support">
             <a
