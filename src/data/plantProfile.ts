@@ -1,16 +1,35 @@
-/** Dex / trading-card facts for Meet — witty, card-tight copy. */
+/** Dex facts for Meet — witty chips, still readable. */
+
+/** Spoken when the Tend-stage plant is clicked. */
+export const PLANT_QUOTES = [
+  'If I were a Pokémon, Grass would be my type.',
+  'Feeling Zen? Or nah?',
+  'Sun! Sun! Sun! We follow orders, sun, or plants die.',
+  'Ama-zinnia-ing!!!!!',
+  'Water me like you mean it — not like a monsoon.',
+  'Deadhead me and I’ll throw a rematch bloom.',
+  'Shade? In this economy? Absolutely not.',
+] as const
+
 export const plantProfile = {
   commonName: 'Common zinnia',
   scientificName: 'Zinnia elegans',
   family: 'Asteraceae',
   order: 'Asterales',
   genus: 'Zinnia',
-  type: 'Flowering annual',
   origin: 'Mexico → windowsills worldwide',
   adopted: '2026-09-26',
-  /** Short chip lines — not sentences. */
-  needs: ['Full sun addict', 'Sip, don’t swamp', 'Airflow or else'],
-  strengths: ['Drama petals', 'Low-drama care', 'Pollinator bait'],
-  weaknesses: ['Powdery mildew magnet', 'Hates wet feet', 'Sulks in shade'],
-  funFacts: ['Named for botanist Zinn', 'Annual, main-character energy', 'Deadhead = encore blooms'],
+  needs: [
+    'Hydration',
+    '6–8 hrs of tanning (sunlight)',
+    'Space (don’t cramp with others)',
+  ],
+  strengths: [
+    'Multispecies rizz (attracts humans & bees)',
+    'Deeper you cut me, more I bloom — grit',
+  ],
+  weaknesses: [
+    'Gets sick if wet too long (powdery mildew)',
+    'Can’t take salinity (no beach days for Zenna)',
+  ],
 } as const

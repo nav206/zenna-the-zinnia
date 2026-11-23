@@ -1,16 +1,36 @@
 import { motion, useReducedMotion } from 'motion/react'
+import { useRef, useState } from 'react'
 import zennaWordmark from '../assets/illustrations/zenna-wordmark-frida.jpg'
 import type { CareActionId, PlantMood } from '../hooks/usePlantMood'
 import { trackCtaClick } from '../lib/analytics'
 import { MeetPlantCard } from './MeetPlantCard'
 
+const PORTFOLIO_URL =
+  'https://sidesofnav.pages.dev/projects/zenna-the-zinnia/'
+
 type MeetSectionProps = {
   mood: PlantMood
   activeEffect: CareActionId | null
+  onEgg?: (message: string) => void
 }
 
-export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
+export function MeetSection({ mood, activeEffect, onEgg }: MeetSectionProps) {
   const reduceMotion = useReducedMotion()
+  const [markClicks, setMarkClicks] = useState(0)
+  const markTimer = useRef<number | null>(null)
+
+  function onWordmarkClick() {
+    const next = markClicks + 1
+    setMarkClicks(next)
+    if (markTimer.current) window.clearTimeout(markTimer.current)
+    markTimer.current = window.setTimeout(() => setMarkClicks(0), 1800)
+    if (next >= 7) {
+      onEgg?.(
+        'Quiet gardener tip: real flowers beat tabs. Someone you love might need one.',
+      )
+      setMarkClicks(0)
+    }
+  }
 
   return (
     <section className="chapter chapter--meet" id="meet" aria-labelledby="meet-title">
@@ -24,13 +44,20 @@ export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
           <h1 id="meet-title" className="visually-hidden">
             Zenna
           </h1>
-          <img
-            className="brand-mark__art"
-            src={zennaWordmark}
-            alt="Zenna — letters wrapped in Frida-style zinnias"
-            width={1280}
-            height={720}
-          />
+          <button
+            type="button"
+            className="brand-mark__hit"
+            onClick={onWordmarkClick}
+            aria-label="Zenna wordmark"
+          >
+            <img
+              className="brand-mark__art"
+              src={zennaWordmark}
+              alt="Zenna — letters wrapped in Frida-style zinnias"
+              width={1280}
+              height={720}
+            />
+          </button>
         </motion.div>
         <motion.p
           className="headline"
@@ -46,9 +73,9 @@ export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
         >
-          An adopted flower learning the light — first her growth story, then a
-          quiet care ritual, on one page. Flip her portrait for a pocket field
-          guide.
+          An adopted plant that teaches me what it is like to show up every day,
+          patiently trust the process, find beauty in steady growth, and bloom
+          even on gloomy days. Flip her portrait for a pocket field guide.
         </motion.p>
         <motion.div
           className="cta-row"
@@ -59,20 +86,34 @@ export function MeetSection({ mood, activeEffect }: MeetSectionProps) {
           <a
             className="cta cta--primary"
             href="#grow"
-            onClick={() => trackCtaClick('watch_her_grow', '#grow')}
+            onClick={() => trackCtaClick('witness_her_growth', '#grow')}
           >
-            Watch her grow
+            Witness her growth
           </a>
           <a
             className="cta cta--ghost"
-            href="#compete"
-            onClick={() => trackCtaClick('compete_against_me', '#compete')}
+            href="#tend"
+            onClick={() => trackCtaClick('grow_my_own_zinnia', '#tend')}
           >
-            Compete against me
+            Grow my own Zinnia
           </a>
         </motion.div>
+        <motion.p
+          className="project-link"
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.36 }}
+        >
+          <a href={PORTFOLIO_URL} target="_blank" rel="noreferrer">
+            Learn more about the project
+          </a>
+        </motion.p>
       </div>
-      <MeetPlantCard mood={mood} activeEffect={activeEffect} />
+      <MeetPlantCard
+        mood={mood}
+        activeEffect={activeEffect}
+        onEgg={onEgg}
+      />
     </section>
   )
 }

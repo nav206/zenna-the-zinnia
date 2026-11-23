@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import heroArt from '../assets/illustrations/zenna-plant-hero.jpg'
+import { PLANT_QUOTES } from '../data/plantProfile'
 import type { CareActionId, PlantMood } from '../hooks/usePlantMood'
 import { moodLabel } from '../hooks/usePlantMood'
 
@@ -9,6 +10,8 @@ type PlantStageProps = {
   activeEffect?: CareActionId | null
   onEffectComplete?: () => void
   compact?: boolean
+  /** Click the plant for a random speech bubble. */
+  talkative?: boolean
 }
 
 function WaterOverlay({ reduce }: { reduce: boolean | null }) {
@@ -181,9 +184,12 @@ export function PlantStage({
   activeEffect = null,
   onEffectComplete,
   compact = false,
+  talkative = false,
 }: PlantStageProps) {
   const reduceMotion = useReducedMotion()
   const label = mood ? moodLabel(mood) : null
+  const [quote, setQuote] = useState<string | null>(null)
+  const quoteTimer = useRef<number | null>(null)
 
   useEffect(() => {
     if (!activeEffect || !onEffectComplete) return
@@ -195,6 +201,22 @@ export function PlantStage({
     const id = window.setTimeout(onEffectComplete, ms)
     return () => window.clearTimeout(id)
   }, [activeEffect, onEffectComplete, reduceMotion])
+
+  useEffect(() => {
+    return () => {
+      if (quoteTimer.current) window.clearTimeout(quoteTimer.current)
+    }
+  }, [])
+
+  function speak() {
+    if (!talkative || !mood) return
+    const next =
+      PLANT_QUOTES[Math.floor(Math.random() * PLANT_QUOTES.length)] ??
+      PLANT_QUOTES[0]
+    setQuote(next)
+    if (quoteTimer.current) window.clearTimeout(quoteTimer.current)
+    quoteTimer.current = window.setTimeout(() => setQuote(null), 3200)
+  }
 
   const sway =
     !reduceMotion &&
@@ -210,10 +232,10 @@ export function PlantStage({
 
   return (
     <div
-      className={`plant-stage${compact ? ' plant-stage--compact' : ''}`}
+      className={`plant-stage${compact ? ' plant-stage--compact' : ''}${
+        talkative && mood ? ' plant-stage--talkative' : ''
+      }`}
       aria-hidden={mood ? undefined : true}
-      role={mood ? 'img' : undefined}
-      aria-label={mood ? `Zenna looking ${label?.toLowerCase()}` : undefined}
     >
       <div className="plant-stage__glow" />
       <motion.div
@@ -232,8 +254,18 @@ export function PlantStage({
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        <motion.div
-          className="plant-stage__art-wrap"
+        <motion.button
+          type="button"
+          className="plant-stage__art-hit"
+          disabled={!talkative || !mood}
+          onClick={speak}
+          aria-label={
+            mood
+              ? talkative
+                ? `Zenna looking ${label?.toLowerCase()} — click to hear her`
+                : `Zenna looking ${label?.toLowerCase()}`
+              : undefined
+          }
           animate={sway || undefined}
           transition={
             activeEffect
@@ -245,15 +277,17 @@ export function PlantStage({
                 }
           }
         >
-          <img
-            className="plant-stage__art"
-            src={heroArt}
-            alt=""
-            width={864}
-            height={1152}
-            draggable={false}
-          />
-        </motion.div>
+          <span className="plant-stage__art-wrap">
+            <img
+              className="plant-stage__art"
+              src={heroArt}
+              alt=""
+              width={864}
+              height={1152}
+              draggable={false}
+            />
+          </span>
+        </motion.button>
 
         <AnimatePresence>
           {activeEffect === 'water' && (
@@ -279,6 +313,31 @@ export function PlantStage({
           </p>
         )}
       </motion.div>
+
+      {/* Outside the clipped oval — sits above the frame in the foreground. */}
+      <AnimatePresence>
+        {quote && (
+          <motion.p
+            key={quote}
+            className="plant-stage__bubble"
+            role="status"
+            initial={
+              reduceMotion
+                ? false
+                : { opacity: 0, y: 10, scale: 0.96, x: '-50%' }
+            }
+            animate={{ opacity: 1, y: 0, scale: 1, x: '-50%' }}
+            exit={
+              reduceMotion
+                ? undefined
+                : { opacity: 0, y: 6, scale: 0.98, x: '-50%' }
+            }
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {quote}
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

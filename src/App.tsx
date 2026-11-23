@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { CompeteSection } from './components/CompeteSection'
+import { EggToast } from './components/EggToast'
 import { FooterRoots } from './components/FooterRoots'
 import { GrowSection } from './components/GrowSection'
 import { MeetSection } from './components/MeetSection'
@@ -16,10 +17,33 @@ import {
 } from './lib/analytics'
 import { fetchCompeteStats, type ApiPlant } from './lib/api'
 
+const SESSION_CARE_KEY = 'zenna-session-care-v1'
+
+function readSessionCare() {
+  try {
+    const raw = sessionStorage.getItem(SESSION_CARE_KEY)
+    const n = raw ? Number(raw) : 0
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0
+  } catch {
+    return 0
+  }
+}
+
+function writeSessionCare(n: number) {
+  try {
+    sessionStorage.setItem(SESSION_CARE_KEY, String(n))
+  } catch {
+    // ignore
+  }
+}
+
 export default function App() {
   const [scope, setScope] = useState<PlantScope>('global')
   const [rootsKey, setRootsKey] = useState(0)
   const [globalSnapshot, setGlobalSnapshot] = useState<ApiPlant | null>(null)
+  const [sessionCare, setSessionCare] = useState(() => readSessionCare())
+  const [eggMessage, setEggMessage] = useState<string | null>(null)
+  const eggTimer = useRef<number | null>(null)
   const auth = useAuth()
 
   const plant = usePlantMood({
@@ -28,6 +52,12 @@ export default function App() {
   })
 
   const setPersonalPlant = auth.setPersonalPlant
+
+  const showEgg = useCallback((message: string) => {
+    setEggMessage(message)
+    if (eggTimer.current) window.clearTimeout(eggTimer.current)
+    eggTimer.current = window.setTimeout(() => setEggMessage(null), 4200)
+  }, [])
 
   const refreshCompete = useCallback(async () => {
     const res = await fetchCompeteStats()
@@ -41,7 +71,14 @@ export default function App() {
   }, [refreshCompete, auth.user?.id])
 
   useEffect(() => {
-    return observeSectionViews(['meet', 'grow', 'compete', 'tend', 'roots'])
+    return observeSectionViews([
+      'meet',
+      'grow',
+      'compete',
+      'tend',
+      'sources',
+      'roots',
+    ])
   }, [])
 
   useEffect(() => {
@@ -109,9 +146,23 @@ export default function App() {
     document.getElementById('tend')?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const handleJoin = () => {
+    setScope('personal')
+    document.getElementById('tend')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const yourCareMoments = auth.user
+    ? (auth.personalPlant?.totalCare ??
+      (scope === 'personal' ? plant.mood.totalCare : 0))
+    : sessionCare
+
   return (
     <main className="story">
-      <MeetSection mood={plant.mood} activeEffect={plant.activeEffect} />
+      <MeetSection
+        mood={plant.mood}
+        activeEffect={plant.activeEffect}
+        onEgg={showEgg}
+      />
       <GrowSection />
       <CompeteSection
         user={auth.user}
@@ -125,8 +176,18 @@ export default function App() {
         mood={plant.mood}
         daytime={plant.daytime}
         activeEffect={plant.activeEffect}
+        yourCareMoments={yourCareMoments}
         onTend={async (action) => {
-          await plant.tend(action)
+          const ok = await plant.tend(action)
+          if (!ok) return
+          // Guests: count this browser’s care toward “Your care”.
+          if (!auth.user) {
+            setSessionCare((c) => {
+              const next = c + 1
+              writeSessionCare(next)
+              return next
+            })
+          }
           trackCareAction(action, scope)
           await refreshCompete()
         }}
@@ -151,7 +212,12 @@ export default function App() {
         }}
         onClearAuthError={() => auth.setError(null)}
       />
-      <FooterRoots refreshKey={rootsKey} />
+      <FooterRoots
+        refreshKey={rootsKey}
+        onJoin={handleJoin}
+        onEgg={showEgg}
+      />
+      <EggToast message={eggMessage} />
     </main>
   )
 }

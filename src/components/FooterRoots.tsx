@@ -2,6 +2,17 @@ import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { fetchRootsStats } from '../lib/api'
 
+const SOURCES = [
+  {
+    label: 'Zinnias — Old Farmer’s Almanac',
+    href: 'https://www.almanac.com/plant/zinnias',
+  },
+  {
+    label: 'Story behind the project',
+    href: 'https://sidesofnav.pages.dev/projects/zenna-the-zinnia/',
+  },
+] as const
+
 function rootPath(i: number, total: number, strength: number) {
   const t = total <= 1 ? 0.5 : i / (total - 1)
   const startX = 8 + t * 84
@@ -14,12 +25,19 @@ function rootPath(i: number, total: number, strength: number) {
 
 type FooterRootsProps = {
   refreshKey?: number
+  onJoin?: () => void
+  onEgg?: (message: string) => void
 }
 
-export function FooterRoots({ refreshKey = 0 }: FooterRootsProps) {
+export function FooterRoots({
+  refreshKey = 0,
+  onJoin,
+  onEgg,
+}: FooterRootsProps) {
   const reduceMotion = useReducedMotion()
   const [signupCount, setSignupCount] = useState(0)
   const [ready, setReady] = useState(false)
+  const [rootClicks, setRootClicks] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -45,9 +63,24 @@ export function FooterRoots({ refreshKey = 0 }: FooterRootsProps) {
     [rootCount, strength],
   )
 
+  function onRootsClick() {
+    const next = rootClicks + 1
+    setRootClicks(next)
+    if (next === 5) {
+      onEgg?.(
+        'The soil remembers. Quiet finds count toward a real-plant giveaway.',
+      )
+      setRootClicks(0)
+    }
+  }
+
   return (
     <footer className="site-footer site-footer--roots" id="roots">
-      <div className="footer-roots" aria-hidden="true">
+      <div
+        className="footer-roots"
+        aria-hidden="true"
+        onClick={onRootsClick}
+      >
         <svg
           className="footer-roots__svg"
           viewBox="0 0 100 120"
@@ -72,14 +105,43 @@ export function FooterRoots({ refreshKey = 0 }: FooterRootsProps) {
           ))}
         </svg>
       </div>
+
       <div className="site-footer__copy">
-        <p>Zenna, the Zinnia — growth story &amp; care garden</p>
-        <p className="site-footer__roots-note">
-          {ready
-            ? signupCount === 0
-              ? 'Roots waiting — each account deepens the footer.'
-              : `Roots from ${signupCount} gardener${signupCount === 1 ? '' : 's'}.`
-            : 'Listening for roots…'}
+        <div className="site-footer__left">
+          <p className="site-footer__gardeners">
+            {ready
+              ? signupCount === 0
+                ? 'No gardeners signed up so far.'
+                : `${signupCount} gardener${signupCount === 1 ? '' : 's'} signed up so far.`
+              : 'Counting gardeners…'}{' '}
+            {onJoin ? (
+              <button type="button" className="text-link" onClick={onJoin}>
+                Join them.
+              </button>
+            ) : (
+              <a className="text-link" href="#tend">
+                Join them.
+              </a>
+            )}
+          </p>
+
+          <div className="footer-sources" id="sources">
+            <h5 className="footer-sources__title">Learn more</h5>
+            <ul className="footer-sources__list" role="list">
+              {SOURCES.map((source) => (
+                <li key={source.href}>
+                  <a href={source.href} target="_blank" rel="noreferrer">
+                    {source.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <p className="footer-sources__note">
+          <span>If this reminded you of someone —</span>
+          <span>buy them flowers, or send them this page.</span>
         </p>
       </div>
     </footer>
