@@ -283,9 +283,11 @@ export function TendSection({
                     <span className="care-action__label">
                       {action.label}
                       {locked ? ' · locked' : ''}
-                      {action.id === 'sunlight' && !locked
-                        ? ` · ${daytime ? 'Daytime detected' : 'Nighttime detected'}`
-                        : ''}
+                      {action.id === 'sunlight' && !locked ? (
+                        <span className="care-action__sky">
+                          ({daytime ? 'Daytime detected' : 'Nighttime detected'})
+                        </span>
+                      ) : null}
                     </span>
                     <span className="care-action__hint">
                       {locked ? action.lockedHint : action.hint}

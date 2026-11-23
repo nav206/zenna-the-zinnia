@@ -856,6 +856,14 @@ code {
   font-size: 1.05rem;
 }
 
+.care-action__sky {
+  margin-left: 0.4rem;
+  font-size: 0.72em;
+  font-weight: 500;
+  color: var(--ink-muted);
+  letter-spacing: 0.01em;
+}
+
 .care-action__hint {
   display: block;
   margin-top: 0.35rem;
